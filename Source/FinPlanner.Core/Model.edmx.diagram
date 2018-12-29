@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="b67c7a01894347acb15d4b8ef2ca731b" Name="Diagram1">
+        <EntityTypeShape EntityType="FinPlannerModel.Account" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="FinPlannerModel.Balance" Width="1.5" PointX="5.25" PointY="1.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="FinPlannerModel.Document" Width="1.5" PointX="0.75" PointY="1.375" IsExpanded="true" />
+        <AssociationConnector Association="FinPlannerModel.FK_Account_Document" ManuallyRouted="false" />
+        <AssociationConnector Association="FinPlannerModel.FK_Balance_Account" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="FinPlannerModel.Goal" Width="1.5" PointX="7.5" PointY="4.375" />
+        <EntityTypeShape EntityType="FinPlannerModel.GoalSet" Width="1.5" PointX="9.75" PointY="4.375" />
+        <AssociationConnector Association="FinPlannerModel.FK_GoalSet_Goal" />
+        <EntityTypeShape EntityType="FinPlannerModel.vGoals" Width="1.5" PointX="5.25" PointY="4.375" />
+        <EntityTypeShape EntityType="FinPlannerModel.vJournal" Width="1.5" PointX="11.875" PointY="1.125" />
+        <EntityTypeShape EntityType="FinPlannerModel.Budget" Width="1.5" PointX="3" PointY="4.375" />
+        <AssociationConnector Association="FinPlannerModel.FK_Budget_Account" />
+        <EntityTypeShape EntityType="FinPlannerModel.vBalanceSheet" Width="1.5" PointX="7.5" PointY="1.125" />
+        <EntityTypeShape EntityType="FinPlannerModel.vCashflow" Width="1.5" PointX="9.75" PointY="1.125" />
+        <EntityTypeShape EntityType="FinPlannerModel.Journal" Width="1.5" PointX="0.875" PointY="4.375" />
+        <AssociationConnector Association="FinPlannerModel.FK_Journal_Account" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

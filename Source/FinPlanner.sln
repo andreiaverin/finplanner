@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.106
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinPlanner.Console", "FinPlanner.Console\FinPlanner.Console.csproj", "{AFBAE37A-8CE1-45C1-A6A7-ABF438B31049}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinPlanner.Core", "FinPlanner.Core\FinPlanner.Core.csproj", "{13D72766-9274-49E1-A9BF-29F9315B5C47}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SQL scripts", "SQL scripts", "{61FACA91-6390-4C64-A227-86D46ED91270}"
+	ProjectSection(SolutionItems) = preProject
+		Create database.sql = Create database.sql
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AFBAE37A-8CE1-45C1-A6A7-ABF438B31049}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFBAE37A-8CE1-45C1-A6A7-ABF438B31049}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFBAE37A-8CE1-45C1-A6A7-ABF438B31049}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFBAE37A-8CE1-45C1-A6A7-ABF438B31049}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13D72766-9274-49E1-A9BF-29F9315B5C47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13D72766-9274-49E1-A9BF-29F9315B5C47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13D72766-9274-49E1-A9BF-29F9315B5C47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13D72766-9274-49E1-A9BF-29F9315B5C47}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {80953316-8EC2-4D54-9373-D6E1583537EC}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,647 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="FinPlannerModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Account">
+          <Key>
+            <PropertyRef Name="AccountID" />
+          </Key>
+          <Property Name="AccountID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DocumentID" Type="int" Nullable="false" />
+          <Property Name="AccountNo" Type="nvarchar" MaxLength="10" Nullable="false" />
+          <Property Name="AccountName" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Parent" Type="nvarchar" MaxLength="10" />
+        </EntityType>
+        <EntityType Name="Balance">
+          <Key>
+            <PropertyRef Name="BalanceID" />
+          </Key>
+          <Property Name="BalanceID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AccountID" Type="int" Nullable="false" />
+          <Property Name="PostingDate" Type="datetime" Nullable="false" />
+          <Property Name="Amount" Type="float" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Budget">
+          <Key>
+            <PropertyRef Name="BudgetID" />
+          </Key>
+          <Property Name="BudgetID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AccountID" Type="int" Nullable="false" />
+          <Property Name="PostingDate" Type="datetime" Nullable="false" />
+          <Property Name="Amount" Type="float" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Document">
+          <Key>
+            <PropertyRef Name="DocumentID" />
+          </Key>
+          <Property Name="DocumentID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DocumentName" Type="nvarchar" MaxLength="255" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Goal">
+          <Key>
+            <PropertyRef Name="GoalID" />
+          </Key>
+          <Property Name="GoalID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="GoalName" Type="nvarchar" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="GoalSet">
+          <Key>
+            <PropertyRef Name="GoalSetID" />
+          </Key>
+          <Property Name="GoalSetID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="GoalID" Type="int" Nullable="false" />
+          <Property Name="StartDate" Type="datetime" Nullable="false" />
+          <Property Name="EndDate" Type="datetime" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Order" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Journal">
+          <Key>
+            <PropertyRef Name="JournalID" />
+          </Key>
+          <Property Name="JournalID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AccountID" Type="int" Nullable="false" />
+          <Property Name="PostingDate" Type="datetime" Nullable="false" />
+          <Property Name="Amount" Type="float" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="1000" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'FinPlanner.dbo.vBalanceSheet' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="vBalanceSheet">
+          <Key>
+            <PropertyRef Name="AccountNo" />
+            <PropertyRef Name="AccountName" />
+            <PropertyRef Name="Amount" />
+            <PropertyRef Name="Level" />
+          </Key>
+          <Property Name="AccountNo" Type="nvarchar" MaxLength="10" Nullable="false" />
+          <Property Name="AccountName" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Amount" Type="float" Nullable="false" />
+          <Property Name="Level" Type="int" Nullable="false" />
+          <Property Name="PostingDate" Type="datetime" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'FinPlanner.dbo.vCashflow' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="vCashflow">
+          <Key>
+            <PropertyRef Name="AccountNo" />
+            <PropertyRef Name="AccountName" />
+            <PropertyRef Name="Amount" />
+            <PropertyRef Name="Budget" />
+            <PropertyRef Name="Level" />
+          </Key>
+          <Property Name="AccountNo" Type="nvarchar" MaxLength="10" Nullable="false" />
+          <Property Name="AccountName" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Amount" Type="float" Nullable="false" />
+          <Property Name="Budget" Type="float" Nullable="false" />
+          <Property Name="Level" Type="int" Nullable="false" />
+          <Property Name="PostingDate" Type="datetime" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'FinPlanner.dbo.vGoals' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="vGoals">
+          <Key>
+            <PropertyRef Name="GoalNo" />
+            <PropertyRef Name="GoalName" />
+            <PropertyRef Name="Due" />
+          </Key>
+          <Property Name="GoalNo" Type="int" Nullable="false" />
+          <Property Name="GoalName" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Due" Type="datetime" Nullable="false" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'FinPlanner.dbo.vJournal' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="vJournal">
+          <Key>
+            <PropertyRef Name="PostingDate" />
+            <PropertyRef Name="AccountNo" />
+            <PropertyRef Name="AccountName" />
+            <PropertyRef Name="Amount" />
+            <PropertyRef Name="Description" />
+          </Key>
+          <Property Name="PostingDate" Type="datetime" Nullable="false" />
+          <Property Name="AccountNo" Type="nvarchar" MaxLength="10" Nullable="false" />
+          <Property Name="AccountName" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Amount" Type="float" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="1000" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Account_Document">
+          <End Role="Document" Type="Self.Document" Multiplicity="1" />
+          <End Role="Account" Type="Self.Account" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Document">
+              <PropertyRef Name="DocumentID" />
+            </Principal>
+            <Dependent Role="Account">
+              <PropertyRef Name="DocumentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Balance_Account">
+          <End Role="Account" Type="Self.Account" Multiplicity="1" />
+          <End Role="Balance" Type="Self.Balance" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Account">
+              <PropertyRef Name="AccountID" />
+            </Principal>
+            <Dependent Role="Balance">
+              <PropertyRef Name="AccountID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Budget_Account">
+          <End Role="Account" Type="Self.Account" Multiplicity="1" />
+          <End Role="Budget" Type="Self.Budget" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Account">
+              <PropertyRef Name="AccountID" />
+            </Principal>
+            <Dependent Role="Budget">
+              <PropertyRef Name="AccountID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_GoalSet_Goal">
+          <End Role="Goal" Type="Self.Goal" Multiplicity="1" />
+          <End Role="GoalSet" Type="Self.GoalSet" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Goal">
+              <PropertyRef Name="GoalID" />
+            </Principal>
+            <Dependent Role="GoalSet">
+              <PropertyRef Name="GoalID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Journal_Account">
+          <End Role="Account" Type="Self.Account" Multiplicity="1" />
+          <End Role="Journal" Type="Self.Journal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Account">
+              <PropertyRef Name="AccountID" />
+            </Principal>
+            <Dependent Role="Journal">
+              <PropertyRef Name="AccountID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="uspCalculateBalanceSheetTotals" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="monthSelector" Type="date" Mode="In" />
+        </Function>
+        <Function Name="uspCalculateCashflowTotals" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="monthSelector" Type="date" Mode="In" />
+        </Function>
+        <Function Name="uspCloseFinancialMonth" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="monthSelector" Type="date" Mode="In" />
+        </Function>
+        <Function Name="uspTransferJournalIntoCashflow" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="monthSelector" Type="date" Mode="In" />
+        </Function>
+        <EntityContainer Name="FinPlannerModelStoreContainer">
+          <EntitySet Name="Account" EntityType="Self.Account" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Balance" EntityType="Self.Balance" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Budget" EntityType="Self.Budget" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Document" EntityType="Self.Document" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Goal" EntityType="Self.Goal" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="GoalSet" EntityType="Self.GoalSet" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Journal" EntityType="Self.Journal" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="vBalanceSheet" EntityType="Self.vBalanceSheet" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vBalanceSheet].[AccountNo] AS [AccountNo], 
+    [vBalanceSheet].[AccountName] AS [AccountName], 
+    [vBalanceSheet].[Amount] AS [Amount], 
+    [vBalanceSheet].[Level] AS [Level], 
+    [vBalanceSheet].[PostingDate] AS [PostingDate]
+    FROM [dbo].[vBalanceSheet] AS [vBalanceSheet]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vCashflow" EntityType="Self.vCashflow" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vCashflow].[AccountNo] AS [AccountNo], 
+    [vCashflow].[AccountName] AS [AccountName], 
+    [vCashflow].[Amount] AS [Amount], 
+    [vCashflow].[Budget] AS [Budget], 
+    [vCashflow].[Level] AS [Level], 
+    [vCashflow].[PostingDate] AS [PostingDate]
+    FROM [dbo].[vCashflow] AS [vCashflow]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vGoals" EntityType="Self.vGoals" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vGoals].[GoalNo] AS [GoalNo], 
+    [vGoals].[GoalName] AS [GoalName], 
+    [vGoals].[Due] AS [Due]
+    FROM [dbo].[vGoals] AS [vGoals]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vJournal" EntityType="Self.vJournal" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vJournal].[PostingDate] AS [PostingDate], 
+    [vJournal].[AccountNo] AS [AccountNo], 
+    [vJournal].[AccountName] AS [AccountName], 
+    [vJournal].[Amount] AS [Amount], 
+    [vJournal].[Description] AS [Description]
+    FROM [dbo].[vJournal] AS [vJournal]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_Account_Document" Association="Self.FK_Account_Document">
+            <End Role="Document" EntitySet="Document" />
+            <End Role="Account" EntitySet="Account" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Balance_Account" Association="Self.FK_Balance_Account">
+            <End Role="Account" EntitySet="Account" />
+            <End Role="Balance" EntitySet="Balance" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Budget_Account" Association="Self.FK_Budget_Account">
+            <End Role="Account" EntitySet="Account" />
+            <End Role="Budget" EntitySet="Budget" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GoalSet_Goal" Association="Self.FK_GoalSet_Goal">
+            <End Role="Goal" EntitySet="Goal" />
+            <End Role="GoalSet" EntitySet="GoalSet" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Journal_Account" Association="Self.FK_Journal_Account">
+            <End Role="Account" EntitySet="Account" />
+            <End Role="Journal" EntitySet="Journal" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="FinPlannerModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Account">
+          <Key>
+            <PropertyRef Name="AccountID" />
+          </Key>
+          <Property Name="AccountID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DocumentID" Type="Int32" Nullable="false" />
+          <Property Name="AccountNo" Type="String" MaxLength="10" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="AccountName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Parent" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Document" Relationship="Self.FK_Account_Document" FromRole="Account" ToRole="Document" />
+          <NavigationProperty Name="Balance" Relationship="Self.FK_Balance_Account" FromRole="Account" ToRole="Balance" />
+          <NavigationProperty Name="Budget" Relationship="FinPlannerModel.FK_Budget_Account" FromRole="Account" ToRole="Budget" />
+          <NavigationProperty Name="Journal" Relationship="FinPlannerModel.FK_Journal_Account" FromRole="Account" ToRole="Journal" />
+        </EntityType>
+        <EntityType Name="Balance">
+          <Key>
+            <PropertyRef Name="BalanceID" />
+          </Key>
+          <Property Name="BalanceID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AccountID" Type="Int32" Nullable="false" />
+          <Property Name="PostingDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Amount" Type="Double" Nullable="false" />
+          <NavigationProperty Name="Account" Relationship="Self.FK_Balance_Account" FromRole="Balance" ToRole="Account" />
+        </EntityType>
+        <EntityType Name="Document">
+          <Key>
+            <PropertyRef Name="DocumentID" />
+          </Key>
+          <Property Name="DocumentID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DocumentName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Account" Relationship="Self.FK_Account_Document" FromRole="Document" ToRole="Account" />
+        </EntityType>
+        <Association Name="FK_Account_Document">
+          <End Role="Document" Type="Self.Document" Multiplicity="1" />
+          <End Role="Account" Type="Self.Account" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Document">
+              <PropertyRef Name="DocumentID" />
+            </Principal>
+            <Dependent Role="Account">
+              <PropertyRef Name="DocumentID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Balance_Account">
+          <End Role="Account" Type="Self.Account" Multiplicity="1" />
+          <End Role="Balance" Type="Self.Balance" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Account">
+              <PropertyRef Name="AccountID" />
+            </Principal>
+            <Dependent Role="Balance">
+              <PropertyRef Name="AccountID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="FinPlannerEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Account" EntityType="Self.Account" />
+          <EntitySet Name="Balance" EntityType="Self.Balance" />
+          <EntitySet Name="Document" EntityType="Self.Document" />
+          <AssociationSet Name="FK_Account_Document" Association="Self.FK_Account_Document">
+            <End Role="Document" EntitySet="Document" />
+            <End Role="Account" EntitySet="Account" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Balance_Account" Association="Self.FK_Balance_Account">
+            <End Role="Account" EntitySet="Account" />
+            <End Role="Balance" EntitySet="Balance" />
+          </AssociationSet>
+          <EntitySet Name="Goal" EntityType="FinPlannerModel.Goal" />
+          <EntitySet Name="GoalSet" EntityType="FinPlannerModel.GoalSet" />
+          <AssociationSet Name="FK_GoalSet_Goal" Association="FinPlannerModel.FK_GoalSet_Goal">
+            <End Role="Goal" EntitySet="Goal" />
+            <End Role="GoalSet" EntitySet="GoalSet" />
+          </AssociationSet>
+          <EntitySet Name="vGoals" EntityType="FinPlannerModel.vGoals" />
+          <EntitySet Name="vJournal" EntityType="FinPlannerModel.vJournal" />
+          <FunctionImport Name="uspCalculateBalanceSheetTotals">
+          <Parameter Name="monthSelector" Mode="In" Type="DateTime" />
+          </FunctionImport>
+          <FunctionImport Name="uspCalculateCashflowTotals">
+          <Parameter Name="monthSelector" Mode="In" Type="DateTime" />
+          </FunctionImport>
+          <FunctionImport Name="uspCloseFinancialMonth">
+          <Parameter Name="monthSelector" Mode="In" Type="DateTime" />
+          </FunctionImport>
+          <FunctionImport Name="uspTransferJournalIntoCashflow">
+          <Parameter Name="monthSelector" Mode="In" Type="DateTime" />
+          </FunctionImport>
+          <EntitySet Name="Budget" EntityType="FinPlannerModel.Budget" />
+          <AssociationSet Name="FK_Budget_Account" Association="FinPlannerModel.FK_Budget_Account">
+            <End Role="Account" EntitySet="Account" />
+            <End Role="Budget" EntitySet="Budget" />
+          </AssociationSet>
+          <EntitySet Name="vBalanceSheet" EntityType="FinPlannerModel.vBalanceSheet" />
+          <EntitySet Name="vCashflow" EntityType="FinPlannerModel.vCashflow" />
+          <EntitySet Name="Journal" EntityType="FinPlannerModel.Journal" />
+          <AssociationSet Name="FK_Journal_Account" Association="FinPlannerModel.FK_Journal_Account">
+            <End Role="Account" EntitySet="Account" />
+            <End Role="Journal" EntitySet="Journal" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Goal">
+          <Key>
+            <PropertyRef Name="GoalID" />
+          </Key>
+          <Property Name="GoalID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="GoalName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="GoalSet" Relationship="FinPlannerModel.FK_GoalSet_Goal" FromRole="Goal" ToRole="GoalSet" />
+        </EntityType>
+        <EntityType Name="GoalSet">
+          <Key>
+            <PropertyRef Name="GoalSetID" />
+          </Key>
+          <Property Name="GoalSetID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="GoalID" Type="Int32" Nullable="false" />
+          <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="EndDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Goal" Relationship="FinPlannerModel.FK_GoalSet_Goal" FromRole="GoalSet" ToRole="Goal" />
+          <Property Name="Order" Type="Int32" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_GoalSet_Goal">
+          <End Type="FinPlannerModel.Goal" Role="Goal" Multiplicity="1" />
+          <End Type="FinPlannerModel.GoalSet" Role="GoalSet" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Goal">
+              <PropertyRef Name="GoalID" />
+            </Principal>
+            <Dependent Role="GoalSet">
+              <PropertyRef Name="GoalID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="vGoals">
+          <Key>
+            <PropertyRef Name="GoalNo" />
+            <PropertyRef Name="GoalName" />
+            <PropertyRef Name="Due" />
+          </Key>
+          <Property Name="GoalNo" Type="Int32" Nullable="false" />
+          <Property Name="GoalName" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Due" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="vJournal">
+          <Key>
+            <PropertyRef Name="PostingDate" />
+            <PropertyRef Name="AccountNo" />
+            <PropertyRef Name="AccountName" />
+            <PropertyRef Name="Amount" />
+            <PropertyRef Name="Description" />
+          </Key>
+          <Property Name="PostingDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="AccountNo" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="AccountName" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Amount" Type="Double" Nullable="false" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="Budget">
+          <Key>
+            <PropertyRef Name="BudgetID" />
+          </Key>
+          <Property Name="BudgetID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AccountID" Type="Int32" Nullable="false" />
+          <Property Name="PostingDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Amount" Type="Double" Nullable="false" />
+          <NavigationProperty Name="Account" Relationship="FinPlannerModel.FK_Budget_Account" FromRole="Budget" ToRole="Account" />
+        </EntityType>
+        <Association Name="FK_Budget_Account">
+          <End Type="FinPlannerModel.Account" Role="Account" Multiplicity="1" />
+          <End Type="FinPlannerModel.Budget" Role="Budget" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Account">
+              <PropertyRef Name="AccountID" />
+            </Principal>
+            <Dependent Role="Budget">
+              <PropertyRef Name="AccountID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="vBalanceSheet">
+          <Key>
+            <PropertyRef Name="AccountNo" />
+            <PropertyRef Name="AccountName" />
+            <PropertyRef Name="Amount" />
+            <PropertyRef Name="Level" />
+          </Key>
+          <Property Name="AccountNo" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="AccountName" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Amount" Type="Double" Nullable="false" />
+          <Property Name="Level" Type="Int32" Nullable="false" />
+          <Property Name="PostingDate" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="vCashflow">
+          <Key>
+            <PropertyRef Name="AccountNo" />
+            <PropertyRef Name="AccountName" />
+            <PropertyRef Name="Amount" />
+            <PropertyRef Name="Budget" />
+            <PropertyRef Name="Level" />
+          </Key>
+          <Property Name="AccountNo" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="AccountName" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Amount" Type="Double" Nullable="false" />
+          <Property Name="Budget" Type="Double" Nullable="false" />
+          <Property Name="Level" Type="Int32" Nullable="false" />
+          <Property Name="PostingDate" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="Journal">
+          <Key>
+            <PropertyRef Name="JournalID" />
+          </Key>
+          <Property Name="JournalID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AccountID" Type="Int32" Nullable="false" />
+          <Property Name="PostingDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Amount" Type="Double" Nullable="false" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Account" Relationship="FinPlannerModel.FK_Journal_Account" FromRole="Journal" ToRole="Account" />
+        </EntityType>
+        <Association Name="FK_Journal_Account">
+          <End Type="FinPlannerModel.Account" Role="Account" Multiplicity="1" />
+          <End Type="FinPlannerModel.Journal" Role="Journal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Account">
+              <PropertyRef Name="AccountID" />
+            </Principal>
+            <Dependent Role="Journal">
+              <PropertyRef Name="AccountID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="FinPlannerModelStoreContainer" CdmEntityContainer="FinPlannerEntities">
+          <EntitySetMapping Name="Account">
+            <EntityTypeMapping TypeName="FinPlannerModel.Account">
+              <MappingFragment StoreEntitySet="Account">
+                <ScalarProperty Name="AccountID" ColumnName="AccountID" />
+                <ScalarProperty Name="DocumentID" ColumnName="DocumentID" />
+                <ScalarProperty Name="AccountNo" ColumnName="AccountNo" />
+                <ScalarProperty Name="AccountName" ColumnName="AccountName" />
+                <ScalarProperty Name="Parent" ColumnName="Parent" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Balance">
+            <EntityTypeMapping TypeName="FinPlannerModel.Balance">
+              <MappingFragment StoreEntitySet="Balance">
+                <ScalarProperty Name="BalanceID" ColumnName="BalanceID" />
+                <ScalarProperty Name="AccountID" ColumnName="AccountID" />
+                <ScalarProperty Name="PostingDate" ColumnName="PostingDate" />
+                <ScalarProperty Name="Amount" ColumnName="Amount" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Document">
+            <EntityTypeMapping TypeName="FinPlannerModel.Document">
+              <MappingFragment StoreEntitySet="Document">
+                <ScalarProperty Name="DocumentID" ColumnName="DocumentID" />
+                <ScalarProperty Name="DocumentName" ColumnName="DocumentName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Goal">
+            <EntityTypeMapping TypeName="FinPlannerModel.Goal">
+              <MappingFragment StoreEntitySet="Goal">
+                <ScalarProperty Name="GoalName" ColumnName="GoalName" />
+                <ScalarProperty Name="GoalID" ColumnName="GoalID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="GoalSet">
+            <EntityTypeMapping TypeName="FinPlannerModel.GoalSet">
+              <MappingFragment StoreEntitySet="GoalSet">
+                <ScalarProperty Name="Order" ColumnName="Order" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="GoalID" ColumnName="GoalID" />
+                <ScalarProperty Name="GoalSetID" ColumnName="GoalSetID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vGoals">
+            <EntityTypeMapping TypeName="FinPlannerModel.vGoals">
+              <MappingFragment StoreEntitySet="vGoals">
+                <ScalarProperty Name="Due" ColumnName="Due" />
+                <ScalarProperty Name="GoalName" ColumnName="GoalName" />
+                <ScalarProperty Name="GoalNo" ColumnName="GoalNo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vJournal">
+            <EntityTypeMapping TypeName="FinPlannerModel.vJournal">
+              <MappingFragment StoreEntitySet="vJournal">
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Amount" ColumnName="Amount" />
+                <ScalarProperty Name="AccountName" ColumnName="AccountName" />
+                <ScalarProperty Name="AccountNo" ColumnName="AccountNo" />
+                <ScalarProperty Name="PostingDate" ColumnName="PostingDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="uspCalculateBalanceSheetTotals" FunctionName="FinPlannerModel.Store.uspCalculateBalanceSheetTotals" />
+          <FunctionImportMapping FunctionImportName="uspCalculateCashflowTotals" FunctionName="FinPlannerModel.Store.uspCalculateCashflowTotals" />
+          <FunctionImportMapping FunctionImportName="uspCloseFinancialMonth" FunctionName="FinPlannerModel.Store.uspCloseFinancialMonth" />
+          <FunctionImportMapping FunctionImportName="uspTransferJournalIntoCashflow" FunctionName="FinPlannerModel.Store.uspTransferJournalIntoCashflow" />
+          <EntitySetMapping Name="Budget">
+            <EntityTypeMapping TypeName="FinPlannerModel.Budget">
+              <MappingFragment StoreEntitySet="Budget">
+                <ScalarProperty Name="Amount" ColumnName="Amount" />
+                <ScalarProperty Name="PostingDate" ColumnName="PostingDate" />
+                <ScalarProperty Name="AccountID" ColumnName="AccountID" />
+                <ScalarProperty Name="BudgetID" ColumnName="BudgetID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vBalanceSheet">
+            <EntityTypeMapping TypeName="FinPlannerModel.vBalanceSheet">
+              <MappingFragment StoreEntitySet="vBalanceSheet">
+                <ScalarProperty Name="PostingDate" ColumnName="PostingDate" />
+                <ScalarProperty Name="Level" ColumnName="Level" />
+                <ScalarProperty Name="Amount" ColumnName="Amount" />
+                <ScalarProperty Name="AccountName" ColumnName="AccountName" />
+                <ScalarProperty Name="AccountNo" ColumnName="AccountNo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vCashflow">
+            <EntityTypeMapping TypeName="FinPlannerModel.vCashflow">
+              <MappingFragment StoreEntitySet="vCashflow">
+                <ScalarProperty Name="PostingDate" ColumnName="PostingDate" />
+                <ScalarProperty Name="Level" ColumnName="Level" />
+                <ScalarProperty Name="Budget" ColumnName="Budget" />
+                <ScalarProperty Name="Amount" ColumnName="Amount" />
+                <ScalarProperty Name="AccountName" ColumnName="AccountName" />
+                <ScalarProperty Name="AccountNo" ColumnName="AccountNo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Journal">
+            <EntityTypeMapping TypeName="FinPlannerModel.Journal">
+              <MappingFragment StoreEntitySet="Journal">
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Amount" ColumnName="Amount" />
+                <ScalarProperty Name="PostingDate" ColumnName="PostingDate" />
+                <ScalarProperty Name="AccountID" ColumnName="AccountID" />
+                <ScalarProperty Name="JournalID" ColumnName="JournalID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
