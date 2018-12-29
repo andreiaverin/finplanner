@@ -1,2 +1,2 @@
 # finplanner
-Simple Financial Planner in C#
+Simple Personal Financial Planner in C#
