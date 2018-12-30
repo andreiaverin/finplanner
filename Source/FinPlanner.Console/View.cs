@@ -78,7 +78,6 @@ namespace FinPlanner.Console
         public event EventHandler<DateTime> JournalRequested;
         public event EventHandler<JournalEntry> JournalUpdated;
         public event EventHandler MonthEndClosingRequested;
-        public event EventHandler<AccountBalanceEntry> BudgetUpdated;
 
         public void Show()
         {
