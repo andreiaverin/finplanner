@@ -14,15 +14,19 @@ namespace FinPlanner.Console
             "0: Exit the program.\n" +
             "1: Display the balance sheet.\n" +
             "2: Update a balance sheet entry.\n" +
-            "3: Close the financial month.\n";            
+            "3: Display the financial goals.\n" +
+            "4: Set the financial goals.\n" +
+            "5: Close the financial month.\n";            
 
-        private const string _optionsNextString = "Please, select one of the options (0-3): ";
+        private const string _optionsNextString = "Please, select one of the options (0-5): ";
 
         // Command codes
         private const string _exitCode = "0";
         private const string _displayBalanceSheetCode = "1";
         private const string _updateBalanceSheetCode = "2";
-        private const string _closeCurrentMonth = "3";
+        private const string _displayFinGoalsCode = "3";
+        private const string _setFinGoalsCode = "4";
+        private const string _closeCurrentMonth = "5";
 
         // Column names
         private const string _amountColumn = "Amount";
@@ -61,6 +65,9 @@ namespace FinPlanner.Console
         // IView interface
         public event EventHandler<DateTime> BalanceSheetRequested;
         public event EventHandler<AccountBalanceEntry> BalanceSheetUpdated;
+        public event EventHandler GoalListRequested;
+        public event EventHandler NewGoalsRequested;
+        public event EventHandler<List<GoalEntry>> NewGoalsSelected;
         public event EventHandler MonthEndClosingRequested;
 
         public void Show()
@@ -94,6 +101,16 @@ namespace FinPlanner.Console
                         case _updateBalanceSheetCode:
                             {
                                 UpdateBalanceSheet();
+                                break;
+                            }
+                        case _displayFinGoalsCode:
+                            {
+                                GoalListRequested(this, new EventArgs());
+                                break;
+                            }
+                        case _setFinGoalsCode:
+                            {
+                                NewGoalsRequested(this, new EventArgs());
                                 break;
                             }
                         case _closeCurrentMonth:
@@ -185,6 +202,108 @@ namespace FinPlanner.Console
 
             // Give the user the success feedback
             System.Console.Write(_balanceSheetEntryUpdateOk);
+        }
+
+        public void ShowGoalList(List<GoalEntry> items)
+        {
+            if (items.Count == 0)
+            {
+                // Tell the user there are no entries
+                System.Console.Write(_noFinancialGoalsSet);
+                return;
+            }
+
+            // Calculate max width for the columns to pad them right
+            int width0 = _goalNoColumn.Length + 2;
+            int width1 = items.Max(x => x.GoalName.Length) + 1;
+
+            // Define the format of the line
+            string format = "{0}{1}{2}\n";
+
+            // Show the table header
+            System.Console.Write(string.Format(format,
+                _goalNoColumn.PadRight(width0),
+                _goalNameColumn.PadRight(width1),
+                _dueToColumn));
+
+            foreach (GoalEntry item in items)
+            {
+                // Format the string
+                string output = string.Format(format,
+                    item.GoalNo.ToString().PadRight(width0),
+                    item.GoalName.PadRight(width1),
+                    item.Due.Year.ToString());
+
+                // Display the balance sheet line
+                System.Console.Write(output);
+            }
+        }
+
+        public void SuggestGoals(List<GoalEntry> items)
+        {
+            // Tell the user what to do
+            System.Console.Write(_setGoalImportance);
+
+            // Iterate through the goals and ask for importance of each goal
+            foreach(var goal in items)
+            {
+                System.Console.Write(goal.GoalName + ": ");
+                var importance = Int16.Parse(System.Console.ReadLine());
+                goal.GoalNo = importance;
+            }
+
+            // Order goals by their importance
+            var orderedGoals = items.OrderBy(x => x.GoalNo).ToList();
+
+            // Take 10 most important goals
+            var top10goals = orderedGoals.Take(_topGoalsNumber);
+
+            // Line-break for better readability
+            System.Console.WriteLine();
+
+            // Tell the user what to do
+            System.Console.Write(_setGoalTerm);
+
+            // Iterate through the top-10 goals and ask for the term
+            foreach (var goal in top10goals)
+            {
+                System.Console.Write(goal.GoalName + ": ");
+                var term = Int16.Parse(System.Console.ReadLine());
+                
+                switch(term)
+                {
+                    case 1:
+                        {
+                            goal.Due = DateTime.Now.AddYears(1);
+                            break;
+                        }
+                    case 2:
+                        {
+                            goal.Due = DateTime.Now.AddYears(5);
+                            break;
+                        }
+                    default:
+                        {
+                            goal.Due = DateTime.Now.AddYears(10);
+                            break;
+                        }
+                }
+            }
+
+            // Sort goals by Due date and then by importance
+            var top10goalsOrdered = top10goals.OrderBy(x => x.Due).ThenBy(x => x.GoalNo).ToList();
+
+            // Renumerate goals
+            for (int i = 0; i < top10goalsOrdered.Count; i++)
+            {
+                top10goalsOrdered[i].GoalNo = i + 1;
+            }
+
+            // Update the goals in the database
+            NewGoalsSelected(this, top10goalsOrdered);
+
+            // Give the user the success feedback
+            System.Console.Write(_newGoalsSetOK);
         }
 
         private void CloseMonthEnd()

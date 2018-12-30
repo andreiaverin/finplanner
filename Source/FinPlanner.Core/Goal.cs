@@ -15,20 +15,27 @@ namespace FinPlanner.Core
 using System;
     using System.Collections.Generic;
     
-public partial class Balance
+public partial class Goal
 {
 
-    public int BalanceID { get; set; }
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+    public Goal()
+    {
 
-    public int AccountID { get; set; }
+        this.GoalSet = new HashSet<GoalSet>();
 
-    public System.DateTime PostingDate { get; set; }
-
-    public double Amount { get; set; }
+    }
 
 
+    public int GoalID { get; set; }
 
-    public virtual Account Account { get; set; }
+    public string GoalName { get; set; }
+
+
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+
+    public virtual ICollection<GoalSet> GoalSet { get; set; }
 
 }
 

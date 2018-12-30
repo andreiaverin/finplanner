@@ -15,20 +15,14 @@ namespace FinPlanner.Core
 using System;
     using System.Collections.Generic;
     
-public partial class Balance
+public partial class vGoals
 {
 
-    public int BalanceID { get; set; }
+    public int GoalNo { get; set; }
 
-    public int AccountID { get; set; }
+    public string GoalName { get; set; }
 
-    public System.DateTime PostingDate { get; set; }
-
-    public double Amount { get; set; }
-
-
-
-    public virtual Account Account { get; set; }
+    public System.DateTime Due { get; set; }
 
 }
 

@@ -6,14 +6,26 @@ GO
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[uspCalculateBalanceSheetTotals]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].[uspCalculateBalanceSheetTotals]
 GO
+IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_GoalSet_Goal]') AND parent_object_id = OBJECT_ID(N'[dbo].[GoalSet]'))
+ALTER TABLE [dbo].[GoalSet] DROP CONSTRAINT [FK_GoalSet_Goal]
+GO
 IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_Balance_Account]') AND parent_object_id = OBJECT_ID(N'[dbo].[Balance]'))
 ALTER TABLE [dbo].[Balance] DROP CONSTRAINT [FK_Balance_Account]
 GO
 IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_Account_Document]') AND parent_object_id = OBJECT_ID(N'[dbo].[Account]'))
 ALTER TABLE [dbo].[Account] DROP CONSTRAINT [FK_Account_Document]
 GO
+IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'[dbo].[vGoals]'))
+DROP VIEW [dbo].[vGoals]
+GO
 IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'[dbo].[vBalanceSheet]'))
 DROP VIEW [dbo].[vBalanceSheet]
+GO
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GoalSet]') AND type in (N'U'))
+DROP TABLE [dbo].[GoalSet]
+GO
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Goal]') AND type in (N'U'))
+DROP TABLE [dbo].[Goal]
 GO
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Document]') AND type in (N'U'))
 DROP TABLE [dbo].[Document]
@@ -72,6 +84,36 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+CREATE TABLE [dbo].[Goal](
+	[GoalID] [int] IDENTITY(1,1) NOT NULL,
+	[GoalName] [nvarchar](255) NULL,
+ CONSTRAINT [PK_Goal] PRIMARY KEY CLUSTERED 
+(
+	[GoalID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[GoalSet](
+	[GoalSetID] [int] IDENTITY(1,1) NOT NULL,
+	[GoalID] [int] NOT NULL,
+	[StartDate] [datetime] NOT NULL,
+	[EndDate] [datetime] NOT NULL,
+	[Description] [nvarchar](255) NOT NULL,
+	[Order] [int] NOT NULL,
+ CONSTRAINT [PK_GoalSet] PRIMARY KEY CLUSTERED 
+(
+	[GoalSetID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
 
 
 CREATE VIEW [dbo].[vBalanceSheet]
@@ -119,6 +161,23 @@ WHERE
 	ACC.DocumentID = 1
 ORDER BY
 	AccountNo
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE VIEW [dbo].[vGoals]
+AS
+SELECT TOP (50) 
+	[Order] AS [GoalNo], 
+	[Description] AS [GoalName], 
+	EndDate AS [Due]
+FROM
+	dbo.GoalSet
+ORDER BY
+	[Order]
 GO
 SET IDENTITY_INSERT [dbo].[Account] ON 
 GO
@@ -338,6 +397,64 @@ INSERT [dbo].[Document] ([DocumentID], [DocumentName]) VALUES (2, N'Cash Flow St
 GO
 SET IDENTITY_INSERT [dbo].[Document] OFF
 GO
+SET IDENTITY_INSERT [dbo].[Goal] ON 
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (1, N'Get a new qualification/education')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (2, N'Change of employment')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (3, N'Financial independence')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (4, N'Be protected against inflation')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (5, N'Diversify investment portfolio')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (6, N'Start a business')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (7, N'Fund a buy–sell agreement')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (8, N'Take early retirement')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (9, N'Adequate retirement income')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (10, N'Buy a retirement home')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (11, N'Large purchase (e.g., car, boat, plane, art)')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (12, N'Minimize income tax')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (13, N'Start savings plan')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (14, N'Acquire emergency fund (6 months'' expenses)')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (15, N'Acquire term life insurance')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (16, N'Convert term life insurance policy to cash-value policy')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (17, N'Contribute maximum to IRA')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (18, N'Acquire disability insurance')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (19, N'Adequate disability income')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (20, N'Provide for survivor in event of my death')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (21, N'Have children')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (22, N'Buy a vacation home')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (23, N'Make home improvements')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (24, N'Take a dream vacation')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (25, N'Reduce debt')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (26, N'Pay off credit card or consumer debt')
+GO
+INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (27, N'Increase level of charitable giving')
+GO
+SET IDENTITY_INSERT [dbo].[Goal] OFF
+GO
 ALTER TABLE [dbo].[Account]  WITH CHECK ADD  CONSTRAINT [FK_Account_Document] FOREIGN KEY([DocumentID])
 REFERENCES [dbo].[Document] ([DocumentID])
 GO
@@ -348,6 +465,11 @@ REFERENCES [dbo].[Account] ([AccountID])
 GO
 ALTER TABLE [dbo].[Balance] CHECK CONSTRAINT [FK_Balance_Account]
 GO
+ALTER TABLE [dbo].[GoalSet]  WITH CHECK ADD  CONSTRAINT [FK_GoalSet_Goal] FOREIGN KEY([GoalID])
+REFERENCES [dbo].[Goal] ([GoalID])
+GO
+ALTER TABLE [dbo].[GoalSet] CHECK CONSTRAINT [FK_GoalSet_Goal]
+GO
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -357,7 +479,7 @@ GO
 -- Create date: 26.12.2018
 -- Description:	Calculates all totals in the balance sheet
 -- =============================================
-ALTER PROCEDURE [dbo].[uspCalculateBalanceSheetTotals]
+CREATE PROCEDURE [dbo].[uspCalculateBalanceSheetTotals]
 	@monthSelector date
 AS
 BEGIN
@@ -542,7 +664,7 @@ BEGIN
 	FROM 
 		[dbo].[Account]
 	WHERE
-		[DocumentID] = 1
-		
+		[DocumentID] = 1;
+
 END
 GO

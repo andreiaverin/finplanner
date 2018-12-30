@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace FinPlanner.Core
 {
@@ -7,9 +10,9 @@ namespace FinPlanner.Core
     {
         private const string _truncateGoalSetSQL = "TRUNCATE TABLE [dbo].[GoalSet]";
         private const string _exAccountNoNotFound = "Account No is not found!";
+        private const string _noCashflowAccountFound = "No cashflow account found. Please, run the init script first.";
         private const string _noBalanceSheetAccountFound = "No balance sheet account found. Please, run the init script first.";
         private const string _noBalanceSheetRecordsFound = "No balance sheet records found. Please, close the previous financial month.";
-        private const string _noCashflowAccountFound = "No cashflow account found. Please, run the init script first.";
         private const string _exMonthAlreadyClosed = "Financial month has been already closed.";
         private const int _balanceSheetDocumentID = 1;
         private const int _cashflowDocumentID = 2;
@@ -21,6 +24,9 @@ namespace FinPlanner.Core
             View = view;
             View.BalanceSheetRequested += View_BalanceSheetRequested;
             View.BalanceSheetUpdated += View_BalanceSheetUpdated;
+            View.GoalListRequested += View_GoalListRequested;
+            View.NewGoalsRequested += View_NewGoalsRequested;
+            View.NewGoalsSelected += View_NewGoalsSelected;
             View.MonthEndClosingRequested += View_MonthEndClosingRequested;
         }
 
@@ -99,6 +105,67 @@ namespace FinPlanner.Core
                 // Update the existing record
                 balance.Amount = e.Amount;
 
+                context.SaveChanges();
+            }
+        }
+
+        private void View_GoalListRequested(object sender, EventArgs e)
+        {
+            using (var context = new FinPlannerEntities())
+            {
+                // Project each row in the view into a GoalEntry
+                var goals = context.vGoals.Select(x =>
+                    new GoalEntry()
+                    {
+                        GoalNo = x.GoalNo,
+                        GoalName = x.GoalName,
+                        Due = x.Due
+                    }
+                    ).ToList();
+
+                // Display goals on UI
+                View.ShowGoalList(goals);
+            }
+        }
+
+        private void View_NewGoalsRequested(object sender, EventArgs e)
+        {
+            using (var context = new FinPlannerEntities())
+            {
+                // Project each row in the view into a GoalEntry
+                var goals = context.Goal.Select(x =>
+                    new GoalEntry()
+                    {
+                        GoalName = x.GoalName,
+                        GoalID = x.GoalID
+                    }
+                    ).ToList();
+
+                // Suggest goals to user
+                View.SuggestGoals(goals);
+            }
+        }
+
+        private void View_NewGoalsSelected(object sender, List<GoalEntry> e)
+        {
+            using (var context = new FinPlannerEntities())
+            {
+                // Truncate the GoalSet table
+                context.Database.ExecuteSqlCommand(_truncateGoalSetSQL);
+
+                foreach(var entry in e)
+                {
+                    context.GoalSet.Add(new GoalSet()
+                    {
+                        Description = entry.GoalName,
+                        StartDate = DateTime.Now,
+                        EndDate = entry.Due,
+                        GoalID = entry.GoalID,
+                        Order = entry.GoalNo
+                    });
+                }
+
+                // Save changes to database
                 context.SaveChanges();
             }
         }

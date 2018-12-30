@@ -31,6 +31,24 @@
           <Property Name="DocumentID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="DocumentName" Type="nvarchar" MaxLength="255" Nullable="false" />
         </EntityType>
+        <EntityType Name="Goal">
+          <Key>
+            <PropertyRef Name="GoalID" />
+          </Key>
+          <Property Name="GoalID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="GoalName" Type="nvarchar" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="GoalSet">
+          <Key>
+            <PropertyRef Name="GoalSetID" />
+          </Key>
+          <Property Name="GoalSetID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="GoalID" Type="int" Nullable="false" />
+          <Property Name="StartDate" Type="datetime" Nullable="false" />
+          <Property Name="EndDate" Type="datetime" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Order" Type="int" Nullable="false" />
+        </EntityType>
         <!--Errors Found During Generation:
 warning 6002: The table/view 'FinPlanner.dbo.vBalanceSheet' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="vBalanceSheet">
@@ -45,6 +63,18 @@ warning 6002: The table/view 'FinPlanner.dbo.vBalanceSheet' does not have a prim
           <Property Name="Amount" Type="float" Nullable="false" />
           <Property Name="Level" Type="int" Nullable="false" />
           <Property Name="PostingDate" Type="datetime" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'FinPlanner.dbo.vGoals' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="vGoals">
+          <Key>
+            <PropertyRef Name="GoalNo" />
+            <PropertyRef Name="GoalName" />
+            <PropertyRef Name="Due" />
+          </Key>
+          <Property Name="GoalNo" Type="int" Nullable="false" />
+          <Property Name="GoalName" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Due" Type="datetime" Nullable="false" />
         </EntityType>
         <Association Name="FK_Account_Document">
           <End Role="Document" Type="Self.Document" Multiplicity="1" />
@@ -70,6 +100,18 @@ warning 6002: The table/view 'FinPlanner.dbo.vBalanceSheet' does not have a prim
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_GoalSet_Goal">
+          <End Role="Goal" Type="Self.Goal" Multiplicity="1" />
+          <End Role="GoalSet" Type="Self.GoalSet" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Goal">
+              <PropertyRef Name="GoalID" />
+            </Principal>
+            <Dependent Role="GoalSet">
+              <PropertyRef Name="GoalID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Function Name="uspCalculateBalanceSheetTotals" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="monthSelector" Type="date" Mode="In" />
         </Function>
@@ -80,6 +122,8 @@ warning 6002: The table/view 'FinPlanner.dbo.vBalanceSheet' does not have a prim
           <EntitySet Name="Account" EntityType="Self.Account" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Balance" EntityType="Self.Balance" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Document" EntityType="Self.Document" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Goal" EntityType="Self.Goal" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="GoalSet" EntityType="Self.GoalSet" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="vBalanceSheet" EntityType="Self.vBalanceSheet" store:Type="Views" store:Schema="dbo">
             <DefiningQuery>SELECT 
     [vBalanceSheet].[AccountNo] AS [AccountNo], 
@@ -89,6 +133,13 @@ warning 6002: The table/view 'FinPlanner.dbo.vBalanceSheet' does not have a prim
     [vBalanceSheet].[PostingDate] AS [PostingDate]
     FROM [dbo].[vBalanceSheet] AS [vBalanceSheet]</DefiningQuery>
           </EntitySet>
+          <EntitySet Name="vGoals" EntityType="Self.vGoals" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [vGoals].[GoalNo] AS [GoalNo], 
+    [vGoals].[GoalName] AS [GoalName], 
+    [vGoals].[Due] AS [Due]
+    FROM [dbo].[vGoals] AS [vGoals]</DefiningQuery>
+          </EntitySet>
           <AssociationSet Name="FK_Account_Document" Association="Self.FK_Account_Document">
             <End Role="Document" EntitySet="Document" />
             <End Role="Account" EntitySet="Account" />
@@ -96,6 +147,10 @@ warning 6002: The table/view 'FinPlanner.dbo.vBalanceSheet' does not have a prim
           <AssociationSet Name="FK_Balance_Account" Association="Self.FK_Balance_Account">
             <End Role="Account" EntitySet="Account" />
             <End Role="Balance" EntitySet="Balance" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GoalSet_Goal" Association="Self.FK_GoalSet_Goal">
+            <End Role="Goal" EntitySet="Goal" />
+            <End Role="GoalSet" EntitySet="GoalSet" />
           </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -106,7 +161,10 @@ warning 6002: The table/view 'FinPlanner.dbo.vBalanceSheet' does not have a prim
           <EntitySet Name="Account" EntityType="FinPlannerModel.Account" />
           <EntitySet Name="Balance" EntityType="FinPlannerModel.Balance" />
           <EntitySet Name="Document" EntityType="FinPlannerModel.Document" />
+          <EntitySet Name="Goal" EntityType="FinPlannerModel.Goal" />
+          <EntitySet Name="GoalSet" EntityType="FinPlannerModel.GoalSet" />
           <EntitySet Name="vBalanceSheet" EntityType="FinPlannerModel.vBalanceSheet" />
+          <EntitySet Name="vGoals" EntityType="FinPlannerModel.vGoals" />
           <AssociationSet Name="FK_Account_Document" Association="FinPlannerModel.FK_Account_Document">
             <End Role="Document" EntitySet="Document" />
             <End Role="Account" EntitySet="Account" />
@@ -114,6 +172,10 @@ warning 6002: The table/view 'FinPlanner.dbo.vBalanceSheet' does not have a prim
           <AssociationSet Name="FK_Balance_Account" Association="FinPlannerModel.FK_Balance_Account">
             <End Role="Account" EntitySet="Account" />
             <End Role="Balance" EntitySet="Balance" />
+          </AssociationSet>
+          <AssociationSet Name="FK_GoalSet_Goal" Association="FinPlannerModel.FK_GoalSet_Goal">
+            <End Role="Goal" EntitySet="Goal" />
+            <End Role="GoalSet" EntitySet="GoalSet" />
           </AssociationSet>
           <FunctionImport Name="uspCalculateBalanceSheetTotals">
             <Parameter Name="monthSelector" Mode="In" Type="DateTime" />
@@ -152,6 +214,26 @@ warning 6002: The table/view 'FinPlanner.dbo.vBalanceSheet' does not have a prim
           <Property Name="DocumentName" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Account" Relationship="FinPlannerModel.FK_Account_Document" FromRole="Document" ToRole="Account" />
         </EntityType>
+        <EntityType Name="Goal">
+          <Key>
+            <PropertyRef Name="GoalID" />
+          </Key>
+          <Property Name="GoalID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="GoalName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="GoalSet" Relationship="FinPlannerModel.FK_GoalSet_Goal" FromRole="Goal" ToRole="GoalSet" />
+        </EntityType>
+        <EntityType Name="GoalSet">
+          <Key>
+            <PropertyRef Name="GoalSetID" />
+          </Key>
+          <Property Name="GoalSetID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="GoalID" Type="Int32" Nullable="false" />
+          <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="EndDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Order" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Goal" Relationship="FinPlannerModel.FK_GoalSet_Goal" FromRole="GoalSet" ToRole="Goal" />
+        </EntityType>
         <EntityType Name="vBalanceSheet">
           <Key>
             <PropertyRef Name="AccountNo" />
@@ -164,6 +246,16 @@ warning 6002: The table/view 'FinPlanner.dbo.vBalanceSheet' does not have a prim
           <Property Name="Amount" Type="Double" Nullable="false" />
           <Property Name="Level" Type="Int32" Nullable="false" />
           <Property Name="PostingDate" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="vGoals">
+          <Key>
+            <PropertyRef Name="GoalNo" />
+            <PropertyRef Name="GoalName" />
+            <PropertyRef Name="Due" />
+          </Key>
+          <Property Name="GoalNo" Type="Int32" Nullable="false" />
+          <Property Name="GoalName" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Due" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
         <Association Name="FK_Account_Document">
           <End Type="FinPlannerModel.Document" Role="Document" Multiplicity="1" />
@@ -186,6 +278,18 @@ warning 6002: The table/view 'FinPlanner.dbo.vBalanceSheet' does not have a prim
             </Principal>
             <Dependent Role="Balance">
               <PropertyRef Name="AccountID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_GoalSet_Goal">
+          <End Type="FinPlannerModel.Goal" Role="Goal" Multiplicity="1" />
+          <End Type="FinPlannerModel.GoalSet" Role="GoalSet" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Goal">
+              <PropertyRef Name="GoalID" />
+            </Principal>
+            <Dependent Role="GoalSet">
+              <PropertyRef Name="GoalID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -224,6 +328,26 @@ warning 6002: The table/view 'FinPlanner.dbo.vBalanceSheet' does not have a prim
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Goal">
+            <EntityTypeMapping TypeName="FinPlannerModel.Goal">
+              <MappingFragment StoreEntitySet="Goal">
+                <ScalarProperty Name="GoalName" ColumnName="GoalName" />
+                <ScalarProperty Name="GoalID" ColumnName="GoalID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="GoalSet">
+            <EntityTypeMapping TypeName="FinPlannerModel.GoalSet">
+              <MappingFragment StoreEntitySet="GoalSet">
+                <ScalarProperty Name="Order" ColumnName="Order" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="GoalID" ColumnName="GoalID" />
+                <ScalarProperty Name="GoalSetID" ColumnName="GoalSetID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="vBalanceSheet">
             <EntityTypeMapping TypeName="FinPlannerModel.vBalanceSheet">
               <MappingFragment StoreEntitySet="vBalanceSheet">
@@ -232,6 +356,15 @@ warning 6002: The table/view 'FinPlanner.dbo.vBalanceSheet' does not have a prim
                 <ScalarProperty Name="Amount" ColumnName="Amount" />
                 <ScalarProperty Name="AccountName" ColumnName="AccountName" />
                 <ScalarProperty Name="AccountNo" ColumnName="AccountNo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vGoals">
+            <EntityTypeMapping TypeName="FinPlannerModel.vGoals">
+              <MappingFragment StoreEntitySet="vGoals">
+                <ScalarProperty Name="Due" ColumnName="Due" />
+                <ScalarProperty Name="GoalName" ColumnName="GoalName" />
+                <ScalarProperty Name="GoalNo" ColumnName="GoalNo" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
