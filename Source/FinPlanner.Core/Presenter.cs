@@ -32,6 +32,7 @@ namespace FinPlanner.Core
             View.JournalRequested += View_JournalRequested;
             View.JournalUpdated += View_JournalUpdated;
             View.MonthEndClosingRequested += View_MonthEndClosingRequested;
+            View.BudgetUpdated += View_BudgetUpdated;
         }
 
         private void View_BalanceSheetRequested(object sender, DateTime e)
@@ -108,6 +109,49 @@ namespace FinPlanner.Core
 
                 // Update the existing record
                 balance.Amount = e.Amount;
+
+                context.SaveChanges();
+            }
+        }
+
+        private void View_BudgetUpdated(object sender, AccountBalanceEntry e)
+        {
+            // Check if the Account No exists
+            using (var context = new FinPlannerEntities())
+            {
+                var account = context.Account.SingleOrDefault(
+                    x => x.AccountNo == e.AccountNo && x.DocumentID == _cashflowDocumentID);
+
+                // If account is not found
+                if (account == null)
+                {
+                    throw new CoreException(_exAccountNoNotFound);
+                }
+
+                var month = DateTime.Now.Month;
+                var year = DateTime.Now.Year;
+
+                // Look for the exisiting account record in this month
+                var budget = context.Budget.SingleOrDefault(
+                    x => x.AccountID == account.AccountID &&
+                    x.PostingDate.Year == year && x.PostingDate.Month == month);
+
+                // if the record is found
+                if (budget != null)
+                {
+                    // Update the existing record
+                    budget.Amount = e.Amount;
+                }
+                else
+                {
+                    // Add a new budget record as of the first day of the month
+                    context.Budget.Add(new Budget()
+                    {
+                        AccountID = account.AccountID,
+                        Amount = e.Amount,
+                        PostingDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1)
+                    });
+                }
 
                 context.SaveChanges();
             }

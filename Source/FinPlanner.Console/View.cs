@@ -17,11 +17,12 @@ namespace FinPlanner.Console
             "3: Display the financial goals.\n" +
             "4: Set the financial goals.\n" +
             "5: Display the cashflow.\n" +
-            "6: Display the monthly journal.\n" +
-            "7: Add a new journal entry.\n" +
-            "8: Close the financial month.\n";            
+            "6: Set the monthly budget.\n" +
+            "7: Display the monthly journal.\n" +
+            "8: Add a new journal entry.\n" +
+            "9: Close the financial month.\n";            
 
-        private const string _optionsNextString = "Please, select one of the options (0-8): ";
+        private const string _optionsNextString = "Please, select one of the options (0-9): ";
 
         // Command codes
         private const string _exitCode = "0";
@@ -30,9 +31,10 @@ namespace FinPlanner.Console
         private const string _displayFinGoalsCode = "3";
         private const string _setFinGoalsCode = "4";
         private const string _displayCashflow = "5";
-        private const string _displayCurrentMonthJournal = "6";
-        private const string _addNewJournalEntry = "7";
-        private const string _closeCurrentMonth = "8";
+        private const string _setMonthlyBudget = "6";
+        private const string _displayCurrentMonthJournal = "7";
+        private const string _addNewJournalEntry = "8";
+        private const string _closeCurrentMonth = "9";
 
         // Column names
         private const string _amountColumn = "Amount";
@@ -78,6 +80,7 @@ namespace FinPlanner.Console
         public event EventHandler<DateTime> JournalRequested;
         public event EventHandler<JournalEntry> JournalUpdated;
         public event EventHandler MonthEndClosingRequested;
+        public event EventHandler<AccountBalanceEntry> BudgetUpdated;
 
         public void Show()
         {
@@ -142,6 +145,11 @@ namespace FinPlanner.Console
                         case _closeCurrentMonth:
                             {
                                 CloseMonthEnd();
+                                break;
+                            }
+                        case _setMonthlyBudget:
+                            {
+                                SetMonthlyBudget();
                                 break;
                             }
                     }
@@ -342,6 +350,32 @@ namespace FinPlanner.Console
 
             // Give the user the success feedback
             System.Console.Write(_balanceSheetEntryUpdateOk);
+        }
+
+        private void SetMonthlyBudget()
+        {
+            string accountNo = string.Empty;
+            double amount = 0;
+
+            // Ask user for Account No
+            System.Console.Write(_enterAccountNo);
+            accountNo = System.Console.ReadLine();
+
+            // Ask user for Budget
+            System.Console.Write(_enterMonthlyBudget);
+            string separator = Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+            System.Windows.Forms.SendKeys.SendWait("0" + separator + "0");
+            amount = Double.Parse(System.Console.ReadLine());
+
+            BudgetUpdated(this,
+                new AccountBalanceEntry()
+                {
+                    AccountNo = accountNo,
+                    Amount = amount
+                });
+
+            // Give the user the success feedback
+            System.Console.Write(_monthlyBudgetEntryUpdateOk);
         }
 
         public void SuggestGoals(List<GoalEntry> items)

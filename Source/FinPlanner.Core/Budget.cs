@@ -12,15 +12,13 @@ namespace FinPlanner.Core
     using System;
     using System.Collections.Generic;
     
-    public partial class GoalSet
+    public partial class Budget
     {
-        public int GoalSetID { get; set; }
-        public int GoalID { get; set; }
-        public System.DateTime StartDate { get; set; }
-        public System.DateTime EndDate { get; set; }
-        public string Description { get; set; }
-        public int Order { get; set; }
+        public int BudgetID { get; set; }
+        public int AccountID { get; set; }
+        public System.DateTime PostingDate { get; set; }
+        public double Amount { get; set; }
     
-        public virtual Goal Goal { get; set; }
+        public virtual Account Account { get; set; }
     }
 }

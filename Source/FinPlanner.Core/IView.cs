@@ -36,7 +36,6 @@ namespace FinPlanner.Core
         event EventHandler<DateTime> BalanceSheetRequested;
         event EventHandler<AccountBalanceEntry> BalanceSheetUpdated;
         void ShowBalanceSheet(List<AccountBalanceEntry> items);
-        event EventHandler MonthEndClosingRequested;
 
         // Step 2: Set Your Financial Goals.
         event EventHandler GoalListRequested;
@@ -49,7 +48,11 @@ namespace FinPlanner.Core
         event EventHandler<DateTime> CashflowRequested;
         event EventHandler<DateTime> JournalRequested;
         event EventHandler<JournalEntry> JournalUpdated;
+        event EventHandler MonthEndClosingRequested;
         void ShowCashflow(List<AccountBalanceEntry> items);
         void ShowJournal(List<JournalEntry> items);
+
+        // Step 4: Set Your Monthly Budget.
+        event EventHandler<AccountBalanceEntry> BudgetUpdated;
     }
 }
