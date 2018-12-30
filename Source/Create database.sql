@@ -357,7 +357,7 @@ GO
 -- Create date: 26.12.2018
 -- Description:	Calculates all totals in the balance sheet
 -- =============================================
-CREATE PROCEDURE [dbo].[uspCalculateBalanceSheetTotals]
+ALTER PROCEDURE [dbo].[uspCalculateBalanceSheetTotals]
 	@monthSelector date
 AS
 BEGIN
@@ -401,20 +401,6 @@ BEGIN
 	WHERE
 		ACC.DocumentID = 1;
 
-	-- Calculate Checking accounts
-	UPDATE DST
-	SET DST.Amount = SRC.Amount
-	FROM @BalanceValues DST
-	INNER JOIN
-	(
-		SELECT SUM(Amount) Amount
-		FROM @BalanceValues
-		WHERE AccountNo IN ('1020','1030')
-		GROUP BY AccountID
-	) SRC
-	ON (1=1)
-	WHERE DST.AccountNo = '1010';
-
 	-- Calculate asset total
 	UPDATE DST
 	SET DST.Amount = SRC.Amount
@@ -424,7 +410,6 @@ BEGIN
 		SELECT SUM(Amount) Amount
 		FROM @BalanceValues
 		WHERE AccountNo IN ('1010','1040','1050','1060','1070','1080','1090')
-		GROUP BY AccountID
 	) SRC
 	ON (1=1)
 	WHERE DST.AccountNo = '1100';
@@ -438,7 +423,6 @@ BEGIN
 		SELECT SUM(Amount) Amount
 		FROM @BalanceValues
 		WHERE AccountNo IN ('1120','1130','1140','1150','1160')
-		GROUP BY AccountID
 	) SRC
 	ON (1=1)
 	WHERE DST.AccountNo = '1170';
@@ -452,7 +436,6 @@ BEGIN
 		SELECT SUM(Amount) Amount
 		FROM @BalanceValues
 		WHERE AccountNo IN ('1190','1200','1210')
-		GROUP BY AccountID
 	) SRC
 	ON (1=1)
 	WHERE DST.AccountNo = '1220';
@@ -466,7 +449,6 @@ BEGIN
 		SELECT SUM(Amount) Amount
 		FROM @BalanceValues
 		WHERE AccountNo IN ('1240','1250','1260','1270','1280','1290','1300')
-		GROUP BY AccountID
 	) SRC
 	ON (1=1)
 	WHERE DST.AccountNo = '1310';
@@ -480,11 +462,10 @@ BEGIN
 		SELECT SUM(Amount) Amount
 		FROM @BalanceValues
 		WHERE AccountNo IN ('1100','1170','1220','1310')
-		GROUP BY AccountID
 	) SRC
 	ON (1=1)
 	WHERE DST.AccountNo = '1320';
-
+	
 	-- Calculate liability total
 	UPDATE DST
 	SET DST.Amount = SRC.Amount
@@ -494,7 +475,6 @@ BEGIN
 		SELECT SUM(Amount) Amount
 		FROM @BalanceValues
 		WHERE AccountNo IN ('1340','1350','1360','1370','1380','1390','1400','1410','1420','1430','1440','1450','1460')
-		GROUP BY AccountID
 	) SRC
 	ON (1=1)
 	WHERE DST.AccountNo = '1470';
