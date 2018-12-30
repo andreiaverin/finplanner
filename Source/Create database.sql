@@ -1,25 +1,10 @@
 USE [FinPlanner]
 GO
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[uspTransferJournalIntoCashflow]') AND type in (N'P', N'PC'))
-DROP PROCEDURE [dbo].[uspTransferJournalIntoCashflow]
-GO
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[uspCloseFinancialMonth]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].[uspCloseFinancialMonth]
 GO
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[uspCalculateCashflowTotals]') AND type in (N'P', N'PC'))
-DROP PROCEDURE [dbo].[uspCalculateCashflowTotals]
-GO
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[uspCalculateBalanceSheetTotals]') AND type in (N'P', N'PC'))
 DROP PROCEDURE [dbo].[uspCalculateBalanceSheetTotals]
-GO
-IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_Journal_Account]') AND parent_object_id = OBJECT_ID(N'[dbo].[Journal]'))
-ALTER TABLE [dbo].[Journal] DROP CONSTRAINT [FK_Journal_Account]
-GO
-IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_GoalSet_Goal]') AND parent_object_id = OBJECT_ID(N'[dbo].[GoalSet]'))
-ALTER TABLE [dbo].[GoalSet] DROP CONSTRAINT [FK_GoalSet_Goal]
-GO
-IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_Budget_Account]') AND parent_object_id = OBJECT_ID(N'[dbo].[Budget]'))
-ALTER TABLE [dbo].[Budget] DROP CONSTRAINT [FK_Budget_Account]
 GO
 IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_Balance_Account]') AND parent_object_id = OBJECT_ID(N'[dbo].[Balance]'))
 ALTER TABLE [dbo].[Balance] DROP CONSTRAINT [FK_Balance_Account]
@@ -27,32 +12,11 @@ GO
 IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_Account_Document]') AND parent_object_id = OBJECT_ID(N'[dbo].[Account]'))
 ALTER TABLE [dbo].[Account] DROP CONSTRAINT [FK_Account_Document]
 GO
-IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'[dbo].[vJournal]'))
-DROP VIEW [dbo].[vJournal]
-GO
-IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'[dbo].[vGoals]'))
-DROP VIEW [dbo].[vGoals]
-GO
-IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'[dbo].[vCashflow]'))
-DROP VIEW [dbo].[vCashflow]
-GO
 IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'[dbo].[vBalanceSheet]'))
 DROP VIEW [dbo].[vBalanceSheet]
 GO
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Journal]') AND type in (N'U'))
-DROP TABLE [dbo].[Journal]
-GO
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GoalSet]') AND type in (N'U'))
-DROP TABLE [dbo].[GoalSet]
-GO
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Goal]') AND type in (N'U'))
-DROP TABLE [dbo].[Goal]
-GO
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Document]') AND type in (N'U'))
 DROP TABLE [dbo].[Document]
-GO
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Budget]') AND type in (N'U'))
-DROP TABLE [dbo].[Budget]
 GO
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Balance]') AND type in (N'U'))
 DROP TABLE [dbo].[Balance]
@@ -95,73 +59,12 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[Budget](
-	[BudgetID] [int] IDENTITY(1,1) NOT NULL,
-	[AccountID] [int] NOT NULL,
-	[PostingDate] [datetime] NOT NULL,
-	[Amount] [float] NOT NULL,
- CONSTRAINT [PK_Budget] PRIMARY KEY CLUSTERED 
-(
-	[BudgetID] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
 CREATE TABLE [dbo].[Document](
 	[DocumentID] [int] IDENTITY(1,1) NOT NULL,
 	[DocumentName] [nvarchar](255) NOT NULL,
  CONSTRAINT [PK_Document] PRIMARY KEY CLUSTERED 
 (
 	[DocumentID] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[Goal](
-	[GoalID] [int] IDENTITY(1,1) NOT NULL,
-	[GoalName] [nvarchar](255) NULL,
- CONSTRAINT [PK_Goal] PRIMARY KEY CLUSTERED 
-(
-	[GoalID] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[GoalSet](
-	[GoalSetID] [int] IDENTITY(1,1) NOT NULL,
-	[GoalID] [int] NOT NULL,
-	[StartDate] [datetime] NOT NULL,
-	[EndDate] [datetime] NOT NULL,
-	[Description] [nvarchar](255) NOT NULL,
-	[Order] [int] NOT NULL,
- CONSTRAINT [PK_GoalSet] PRIMARY KEY CLUSTERED 
-(
-	[GoalSetID] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[Journal](
-	[JournalID] [int] IDENTITY(1,1) NOT NULL,
-	[AccountID] [int] NOT NULL,
-	[PostingDate] [datetime] NOT NULL,
-	[Amount] [float] NOT NULL,
-	[Description] [nvarchar](1000) NOT NULL,
- CONSTRAINT [PK_Journal] PRIMARY KEY CLUSTERED 
-(
-	[JournalID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
@@ -216,103 +119,6 @@ WHERE
 	ACC.DocumentID = 1
 ORDER BY
 	AccountNo
-GO
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-
-
-
-CREATE VIEW [dbo].[vCashflow]
-AS
-SELECT TOP(1000)
-	ACC.AccountNo,
-	ACC.AccountName,
-	ISNULL(BAL.Amount, 0) AS Amount,
-	ISNULL(BDG.Amount, 0) AS Budget,
-	CASE WHEN ACC.[Parent] IS NULL THEN 0 ELSE 
-		CASE WHEN PAR.[Parent] IS NULL THEN 1 ELSE 2 END	
-	END AS [Level],
-	BAL.PostingDate
-FROM
-	[dbo].[Account] ACC
-LEFT JOIN
-	[dbo].[Account] PAR
-ON
-	ACC.Parent = PAR.AccountNo AND ACC.DocumentID = PAR.DocumentID
-LEFT JOIN
-(
-	SELECT
-		SRC1.AccountID,
-		SRC1.Amount,
-		SRC1.PostingDate
-	FROM
-		[dbo].[Balance] SRC1
-	INNER JOIN
-	(
-		SELECT
-			MIN(BalanceID) AS BalanceID,
-			MONTH(PostingDate) AS Month,
-			YEAR(PostingDate) AS Year,
-			AccountID
-		FROM
-			[dbo].[Balance] 
-		GROUP BY
-			AccountID, YEAR(PostingDate), MONTH(PostingDate)
-	) SRC2
-	ON
-		SRC1.AccountID = SRC2.AccountID AND SRC1.BalanceID = SRC2.BalanceID
-) BAL
-ON
-	ACC.AccountID = BAL.AccountID
-LEFT JOIN
-	[dbo].[Budget] BDG
-ON
-	BDG.AccountID = BAL.AccountID AND BDG.PostingDate = BAL.PostingDate
-WHERE
-	ACC.DocumentID = 2
-ORDER BY
-	AccountNo
-GO
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-
-CREATE VIEW [dbo].[vGoals]
-AS
-SELECT TOP (50) 
-	[Order] AS [GoalNo], 
-	[Description] AS [GoalName], 
-	EndDate AS [Due]
-FROM
-	dbo.GoalSet
-ORDER BY
-	[Order]
-GO
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-
-CREATE VIEW [dbo].[vJournal]
-AS
-SELECT
-	JRN.[PostingDate],
-	ACC.[AccountNo],
-	ACC.[AccountName],
-	JRN.[Amount], 
-	JRN.[Description]
-FROM
-	dbo.Journal AS JRN 
-INNER JOIN
-	dbo.Account AS ACC 
-ON
-	JRN.AccountID = ACC.AccountID
 GO
 SET IDENTITY_INSERT [dbo].[Account] ON 
 GO
@@ -532,64 +338,6 @@ INSERT [dbo].[Document] ([DocumentID], [DocumentName]) VALUES (2, N'Cash Flow St
 GO
 SET IDENTITY_INSERT [dbo].[Document] OFF
 GO
-SET IDENTITY_INSERT [dbo].[Goal] ON 
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (1, N'Get a new qualification/education')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (2, N'Change of employment')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (3, N'Financial independence')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (4, N'Be protected against inflation')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (5, N'Diversify investment portfolio')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (6, N'Start a business')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (7, N'Fund a buy–sell agreement')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (8, N'Take early retirement')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (9, N'Adequate retirement income')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (10, N'Buy a retirement home')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (11, N'Large purchase (e.g., car, boat, plane, art)')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (12, N'Minimize income tax')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (13, N'Start savings plan')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (14, N'Acquire emergency fund (6 months'' expenses)')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (15, N'Acquire term life insurance')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (16, N'Convert term life insurance policy to cash-value policy')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (17, N'Contribute maximum to IRA')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (18, N'Acquire disability insurance')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (19, N'Adequate disability income')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (20, N'Provide for survivor in event of my death')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (21, N'Have children')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (22, N'Buy a vacation home')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (23, N'Make home improvements')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (24, N'Take a dream vacation')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (25, N'Reduce debt')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (26, N'Pay off credit card or consumer debt')
-GO
-INSERT [dbo].[Goal] ([GoalID], [GoalName]) VALUES (27, N'Increase level of charitable giving')
-GO
-SET IDENTITY_INSERT [dbo].[Goal] OFF
-GO
 ALTER TABLE [dbo].[Account]  WITH CHECK ADD  CONSTRAINT [FK_Account_Document] FOREIGN KEY([DocumentID])
 REFERENCES [dbo].[Document] ([DocumentID])
 GO
@@ -599,21 +347,6 @@ ALTER TABLE [dbo].[Balance]  WITH CHECK ADD  CONSTRAINT [FK_Balance_Account] FOR
 REFERENCES [dbo].[Account] ([AccountID])
 GO
 ALTER TABLE [dbo].[Balance] CHECK CONSTRAINT [FK_Balance_Account]
-GO
-ALTER TABLE [dbo].[Budget]  WITH CHECK ADD  CONSTRAINT [FK_Budget_Account] FOREIGN KEY([AccountID])
-REFERENCES [dbo].[Account] ([AccountID])
-GO
-ALTER TABLE [dbo].[Budget] CHECK CONSTRAINT [FK_Budget_Account]
-GO
-ALTER TABLE [dbo].[GoalSet]  WITH CHECK ADD  CONSTRAINT [FK_GoalSet_Goal] FOREIGN KEY([GoalID])
-REFERENCES [dbo].[Goal] ([GoalID])
-GO
-ALTER TABLE [dbo].[GoalSet] CHECK CONSTRAINT [FK_GoalSet_Goal]
-GO
-ALTER TABLE [dbo].[Journal]  WITH CHECK ADD  CONSTRAINT [FK_Journal_Account] FOREIGN KEY([AccountID])
-REFERENCES [dbo].[Account] ([AccountID])
-GO
-ALTER TABLE [dbo].[Journal] CHECK CONSTRAINT [FK_Journal_Account]
 GO
 SET ANSI_NULLS ON
 GO
@@ -802,179 +535,6 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
--- =============================================
--- Author:		Andrei Averin
--- Create date: 28.12.2018
--- Description:	Calculates all totals in the cashflow
--- =============================================
-CREATE PROCEDURE [dbo].[uspCalculateCashflowTotals]
-	@monthSelector date
-AS
-BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from
-	-- interfering with SELECT statements.
-	SET NOCOUNT ON;
-
-	-- SET NOCOUNT ON added to prevent extra result sets from
-	-- interfering with SELECT statements.
-	SET NOCOUNT ON;
-
-	DECLARE @BalanceValues TABLE 
-	( 
-		AccountID INT NOT NULL,
-		AccountNo NVARCHAR(10) NOT NULL,
-		Amount FLOAT
-	);
-
-	INSERT INTO @BalanceValues
-	SELECT
-		SRC1.AccountID,
-		ACC.AccountNo,
-		SRC1.Amount
-	FROM
-		[dbo].[Balance] SRC1
-	INNER JOIN
-	(
-		SELECT
-			MAX(BalanceID) AS BalanceID,
-			AccountID
-		FROM
-			[dbo].[Balance]
-		WHERE
-			YEAR([PostingDate]) = YEAR(@monthSelector) AND
-			MONTH([PostingDate]) = MONTH(@monthSelector) 
-		GROUP BY
-			AccountID
-	) SRC2
-	ON
-		SRC1.AccountID = SRC2.AccountID AND SRC1.BalanceID = SRC2.BalanceID
-	INNER JOIN
-		[dbo].[Account] ACC
-	ON
-		ACC.AccountID = SRC1.AccountID
-	WHERE
-		ACC.DocumentID = 2;
-
-	-- Calculate Total cash available
-	UPDATE DST
-	SET DST.Amount = SRC.Amount
-	FROM @BalanceValues DST
-	INNER JOIN
-	(
-		SELECT SUM(Amount) Amount
-		FROM @BalanceValues
-		WHERE AccountNo IN ('1500','1510','1520','1530','1540','1550','1560','1570','1580','1590')
-		GROUP BY AccountID
-	) SRC
-	ON (1=1)
-	WHERE DST.AccountNo = '1600';
-
-	-- Calculate Utility payments
-	UPDATE DST
-	SET DST.Amount = SRC.Amount
-	FROM @BalanceValues DST
-	INNER JOIN
-	(
-		SELECT SUM(Amount) Amount
-		FROM @BalanceValues
-		WHERE AccountNo IN ('1640','1650','1660','1670')
-		GROUP BY AccountID
-	) SRC
-	ON (1=1)
-	WHERE DST.AccountNo = '1630';
-	
-	-- Calculate Car/commuting expenses
-	UPDATE DST
-	SET DST.Amount = SRC.Amount
-	FROM @BalanceValues DST
-	INNER JOIN
-	(
-		SELECT SUM(Amount) Amount
-		FROM @BalanceValues
-		WHERE AccountNo IN ('1720','1730','1740')
-		GROUP BY AccountID
-	) SRC
-	ON (1=1)
-	WHERE DST.AccountNo = '1710';
-
-	-- Calculate Insurance premiums
-	UPDATE DST
-	SET DST.Amount = SRC.Amount
-	FROM @BalanceValues DST
-	INNER JOIN
-	(
-		SELECT SUM(Amount) Amount
-		FROM @BalanceValues
-		WHERE AccountNo IN ('1770','1780','1790','1800','1810','1820','1830')
-		GROUP BY AccountID
-	) SRC
-	ON (1=1)
-	WHERE DST.AccountNo = '1760';
-
-	-- Calculate Savings/investments
-	UPDATE DST
-	SET DST.Amount = SRC.Amount
-	FROM @BalanceValues DST
-	INNER JOIN
-	(
-		SELECT SUM(Amount) Amount
-		FROM @BalanceValues
-		WHERE AccountNo IN ('1980','1990','2000','2010')
-		GROUP BY AccountID
-	) SRC
-	ON (1=1)
-	WHERE DST.AccountNo = '1970';
-
-	-- Calculate Total expenses
-	UPDATE DST
-	SET DST.Amount = SRC.Amount
-	FROM @BalanceValues DST
-	INNER JOIN
-	(
-		SELECT SUM(Amount) Amount
-		FROM @BalanceValues
-		WHERE AccountNo IN ('1620','1630','1680','1690','1700','1710','1750','1760','1840','1850','1860','1870','1880','1890','1900','1910','1920','1930','1940','1950','1960','1970','2020')
-		GROUP BY AccountID
-	) SRC
-	ON (1=1)
-	WHERE DST.AccountNo = '2030';
-	
-	-- Calculate Net worth
-	UPDATE @BalanceValues
-	SET Amount = 
-		(SELECT TOP(1) Amount FROM @BalanceValues WHERE AccountNo = '1600') -
-		(SELECT TOP(1) Amount FROM @BalanceValues WHERE AccountNo = '2030')
-	FROM @BalanceValues
-	WHERE AccountNo = '2040';
-
-	UPDATE DST
-	SET DST.Amount = SRC.Amount
-	FROM
-		 [dbo].[Balance] DST
-	INNER JOIN
-	(
-		SELECT
-			MAX(BalanceID) AS BalanceID,
-			AccountID
-		FROM
-			[dbo].[Balance]
-		GROUP BY
-			AccountID
-	) REF
-	ON
-		DST.BalanceID = REF.BalanceID AND DST.AccountID = REF.AccountID 
-	INNER JOIN
-		@BalanceValues SRC
-	ON
-		SRC.AccountID = REF.AccountID;
-		
-END
-GO
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
 
 
 -- =============================================
@@ -990,12 +550,6 @@ BEGIN
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
 
-	-- Sum up all monthly journal entries into the cashflow statement
-	EXEC [dbo].[uspTransferJournalIntoCashflow] @monthSelector;
-
-	-- Calculate the cashflow totals
-	EXEC [dbo].[uspCalculateCashflowTotals] @monthSelector;
-
 	-- Create cashflow balance records for the new current month
 	INSERT INTO [dbo].[Balance]
            ([AccountID]
@@ -1008,79 +562,7 @@ BEGIN
 	FROM 
 		[dbo].[Account]
 	WHERE
-		[DocumentID] IN (1,2)
-
-	-- Transfer budget values to the next month
-	INSERT INTO
-		[dbo].[Budget]
-	SELECT
-		[AccountID],
-		DATEADD(month, DATEDIFF(month, 0, CURRENT_TIMESTAMP), 0)  AS [PostingDate], -- + 1 month
-		[Amount]
-	FROM
-		[dbo].[Budget]
-	WHERE
-		YEAR(PostingDate) = YEAR(@monthSelector) AND MONTH(PostingDate) = MONTH(@monthSelector);
+		[DocumentID] = 1
 		
-END
-GO
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
--- =============================================
--- Author:		Andrei Averin
--- Create date: 29.12.2018
--- Description:	Sums journal entries into the cashflow statement
--- =============================================
-CREATE PROCEDURE [dbo].[uspTransferJournalIntoCashflow]
-	@monthSelector date
-AS
-BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from
-	-- interfering with SELECT statements.
-	SET NOCOUNT ON;
-
-    -- Update the cashflow balance for the actual month
-	UPDATE DST
-	SET DST.Amount = SRC.Amount
-	FROM [dbo].[Balance] DST
-	INNER JOIN
-	(
-		SELECT
-			MIN(BLN.BalanceID) AS BalanceID,
-			BLN.AccountID
-		FROM
-			[dbo].[Balance] BLN
-		INNER JOIN
-			[dbo].[Account] ACC
-		ON
-			ACC.AccountID = BLN.AccountID
-		WHERE
-			ACC.DocumentID = 2 AND
-			MONTH(BLN.[PostingDate]) = MONTH(@monthSelector) AND
-			YEAR(BLN.[PostingDate]) = YEAR(@monthSelector)
-		GROUP BY
-			BLN.AccountID
-	) REF
-	ON
-		DST.AccountID = REF.AccountID AND DST.BalanceID = REF.BalanceID
-	INNER JOIN
-	(
-		SELECT
-			 JRN.[AccountID]
-			,SUM(JRN.[Amount]) AS [Amount]
-		FROM [dbo].[Journal] JRN
-		INNER JOIN [dbo].[Account] ACC
-		ON
-			JRN.AccountID = ACC.AccountID
-		WHERE
-			MONTH(JRN.[PostingDate]) = MONTH(@monthSelector) AND
-			YEAR(JRN.[PostingDate]) = YEAR(@monthSelector)
-		GROUP BY
-			JRN.[AccountID]
-	) SRC
-	ON
-		REF.AccountID = SRC.AccountID;
 END
 GO
