@@ -30,14 +30,7 @@ namespace FinPlanner.Core
         public virtual DbSet<Account> Account { get; set; }
         public virtual DbSet<Balance> Balance { get; set; }
         public virtual DbSet<Document> Document { get; set; }
-        public virtual DbSet<Goal> Goal { get; set; }
-        public virtual DbSet<GoalSet> GoalSet { get; set; }
-        public virtual DbSet<vGoals> vGoals { get; set; }
-        public virtual DbSet<vJournal> vJournal { get; set; }
-        public virtual DbSet<Budget> Budget { get; set; }
         public virtual DbSet<vBalanceSheet> vBalanceSheet { get; set; }
-        public virtual DbSet<vCashflow> vCashflow { get; set; }
-        public virtual DbSet<Journal> Journal { get; set; }
     
         public virtual int uspCalculateBalanceSheetTotals(Nullable<System.DateTime> monthSelector)
         {
@@ -48,15 +41,6 @@ namespace FinPlanner.Core
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("uspCalculateBalanceSheetTotals", monthSelectorParameter);
         }
     
-        public virtual int uspCalculateCashflowTotals(Nullable<System.DateTime> monthSelector)
-        {
-            var monthSelectorParameter = monthSelector.HasValue ?
-                new ObjectParameter("monthSelector", monthSelector) :
-                new ObjectParameter("monthSelector", typeof(System.DateTime));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("uspCalculateCashflowTotals", monthSelectorParameter);
-        }
-    
         public virtual int uspCloseFinancialMonth(Nullable<System.DateTime> monthSelector)
         {
             var monthSelectorParameter = monthSelector.HasValue ?
@@ -64,15 +48,6 @@ namespace FinPlanner.Core
                 new ObjectParameter("monthSelector", typeof(System.DateTime));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("uspCloseFinancialMonth", monthSelectorParameter);
-        }
-    
-        public virtual int uspTransferJournalIntoCashflow(Nullable<System.DateTime> monthSelector)
-        {
-            var monthSelectorParameter = monthSelector.HasValue ?
-                new ObjectParameter("monthSelector", monthSelector) :
-                new ObjectParameter("monthSelector", typeof(System.DateTime));
-    
-            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("uspTransferJournalIntoCashflow", monthSelectorParameter);
         }
     }
 }

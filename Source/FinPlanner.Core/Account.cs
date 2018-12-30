@@ -18,8 +18,6 @@ namespace FinPlanner.Core
         public Account()
         {
             this.Balance = new HashSet<Balance>();
-            this.Budget = new HashSet<Budget>();
-            this.Journal = new HashSet<Journal>();
         }
     
         public int AccountID { get; set; }
@@ -31,9 +29,5 @@ namespace FinPlanner.Core
         public virtual Document Document { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Balance> Balance { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Budget> Budget { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Journal> Journal { get; set; }
     }
 }
