@@ -24,6 +24,8 @@ public partial class Account
 
         this.Balance = new HashSet<Balance>();
 
+        this.Journal = new HashSet<Journal>();
+
     }
 
 
@@ -44,6 +46,10 @@ public partial class Account
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
 
     public virtual ICollection<Balance> Balance { get; set; }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+
+    public virtual ICollection<Journal> Journal { get; set; }
 
 }
 

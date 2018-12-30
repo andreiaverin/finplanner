@@ -5,15 +5,19 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="b67c7a01894347acb15d4b8ef2ca731b" Name="Diagram1">
-        <EntityTypeShape EntityType="FinPlannerModel.Account" Width="1.5" PointX="3" PointY="1" />
-        <EntityTypeShape EntityType="FinPlannerModel.Balance" Width="1.5" PointX="5.25" PointY="1" />
-        <EntityTypeShape EntityType="FinPlannerModel.Document" Width="1.5" PointX="0.75" PointY="1" />
-        <EntityTypeShape EntityType="FinPlannerModel.Goal" Width="1.5" PointX="0.75" PointY="3.75" />
-        <EntityTypeShape EntityType="FinPlannerModel.GoalSet" Width="1.5" PointX="3" PointY="3.75" />
-        <EntityTypeShape EntityType="FinPlannerModel.vBalanceSheet" Width="1.5" PointX="7.375" PointY="1" />
-        <EntityTypeShape EntityType="FinPlannerModel.vGoals" Width="1.5" PointX="5.25" PointY="3.75" />
+        <EntityTypeShape EntityType="FinPlannerModel.Account" Width="1.5" PointX="3" PointY="2.25" />
+        <EntityTypeShape EntityType="FinPlannerModel.Balance" Width="1.5" PointX="5.25" PointY="1.125" />
+        <EntityTypeShape EntityType="FinPlannerModel.Document" Width="1.5" PointX="0.75" PointY="2.75" />
+        <EntityTypeShape EntityType="FinPlannerModel.Goal" Width="1.5" PointX="10.125" PointY="0.875" />
+        <EntityTypeShape EntityType="FinPlannerModel.GoalSet" Width="1.5" PointX="12.375" PointY="0.5" />
+        <EntityTypeShape EntityType="FinPlannerModel.Journal" Width="1.5" PointX="5.25" PointY="3.75" />
+        <EntityTypeShape EntityType="FinPlannerModel.vBalanceSheet" Width="1.5" PointX="10.125" PointY="3.75" />
+        <EntityTypeShape EntityType="FinPlannerModel.vCashflow" Width="1.5" PointX="7.75" PointY="0.75" />
+        <EntityTypeShape EntityType="FinPlannerModel.vGoals" Width="1.5" PointX="7.75" PointY="3.75" />
+        <EntityTypeShape EntityType="FinPlannerModel.vJournal" Width="1.5" PointX="12.125" PointY="3.75" />
         <AssociationConnector Association="FinPlannerModel.FK_Account_Document" />
         <AssociationConnector Association="FinPlannerModel.FK_Balance_Account" />
+        <AssociationConnector Association="FinPlannerModel.FK_Journal_Account" />
         <AssociationConnector Association="FinPlannerModel.FK_GoalSet_Goal" />
       </Diagram>
     </edmx:Diagrams>

@@ -21,6 +21,15 @@ namespace FinPlanner.Core
         public int GoalID { get; set; }
     }
 
+    public class JournalEntry
+    {
+        public DateTime PostingDate { get; set; }
+        public string AccountNo { get; set; }
+        public string AccountName { get; set; }
+        public double Amount { get; set; }
+        public string Description { get; set; }
+    }
+
     public interface IView
     {
         // Step 1: Determine Your Personal Net Worth.
@@ -35,5 +44,12 @@ namespace FinPlanner.Core
         event EventHandler<List<GoalEntry>> NewGoalsSelected;
         void ShowGoalList(List<GoalEntry> items);
         void SuggestGoals(List<GoalEntry> items);
+
+        // Step 3: Keep Simple Records.
+        event EventHandler<DateTime> CashflowRequested;
+        event EventHandler<DateTime> JournalRequested;
+        event EventHandler<JournalEntry> JournalUpdated;
+        void ShowCashflow(List<AccountBalanceEntry> items);
+        void ShowJournal(List<JournalEntry> items);
     }
 }

@@ -16,9 +16,12 @@ namespace FinPlanner.Console
             "2: Update a balance sheet entry.\n" +
             "3: Display the financial goals.\n" +
             "4: Set the financial goals.\n" +
-            "5: Close the financial month.\n";            
+            "5: Display the cashflow.\n" +
+            "6: Display the monthly journal.\n" +
+            "7: Add a new journal entry.\n" +
+            "8: Close the financial month.\n";            
 
-        private const string _optionsNextString = "Please, select one of the options (0-5): ";
+        private const string _optionsNextString = "Please, select one of the options (0-8): ";
 
         // Command codes
         private const string _exitCode = "0";
@@ -26,7 +29,10 @@ namespace FinPlanner.Console
         private const string _updateBalanceSheetCode = "2";
         private const string _displayFinGoalsCode = "3";
         private const string _setFinGoalsCode = "4";
-        private const string _closeCurrentMonth = "5";
+        private const string _displayCashflow = "5";
+        private const string _displayCurrentMonthJournal = "6";
+        private const string _addNewJournalEntry = "7";
+        private const string _closeCurrentMonth = "8";
 
         // Column names
         private const string _amountColumn = "Amount";
@@ -68,7 +74,11 @@ namespace FinPlanner.Console
         public event EventHandler GoalListRequested;
         public event EventHandler NewGoalsRequested;
         public event EventHandler<List<GoalEntry>> NewGoalsSelected;
+        public event EventHandler<DateTime> CashflowRequested;
+        public event EventHandler<DateTime> JournalRequested;
+        public event EventHandler<JournalEntry> JournalUpdated;
         public event EventHandler MonthEndClosingRequested;
+        public event EventHandler<AccountBalanceEntry> BudgetUpdated;
 
         public void Show()
         {
@@ -111,6 +121,23 @@ namespace FinPlanner.Console
                         case _setFinGoalsCode:
                             {
                                 NewGoalsRequested(this, new EventArgs());
+                                break;
+                            }
+                        case _displayCurrentMonthJournal:
+                            {
+                                var date = EnterMonth();
+                                JournalRequested(this, date);
+                                break;
+                            }
+                        case _addNewJournalEntry:
+                            {
+                                AddNewJournalEntry();
+                                break;
+                            }
+                        case _displayCashflow:
+                            {
+                                var date = EnterMonth();
+                                CashflowRequested(this, date);
                                 break;
                             }
                         case _closeCurrentMonth:
@@ -178,32 +205,6 @@ namespace FinPlanner.Console
             }
         }
 
-        private void UpdateBalanceSheet()
-        {
-            string accountNo = string.Empty;
-            double amount = 0;
-
-            // Ask user for Account No
-            System.Console.Write(_enterAccountNo);
-            accountNo = System.Console.ReadLine();
-
-            // Ask user for Amount
-            System.Console.Write(_enterAmount);
-            string separator = Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
-            System.Windows.Forms.SendKeys.SendWait("0" + separator + "0");
-            amount = Double.Parse(System.Console.ReadLine());
-
-            BalanceSheetUpdated(this,
-                new AccountBalanceEntry()
-                {
-                    AccountNo = accountNo,
-                    Amount = amount
-                });
-
-            // Give the user the success feedback
-            System.Console.Write(_balanceSheetEntryUpdateOk);
-        }
-
         public void ShowGoalList(List<GoalEntry> items)
         {
             if (items.Count == 0)
@@ -237,6 +238,111 @@ namespace FinPlanner.Console
                 // Display the balance sheet line
                 System.Console.Write(output);
             }
+        }
+
+        public void ShowJournal(List<JournalEntry> items)
+        {
+            if (items.Count == 0)
+            {
+                // Tell the user there are no entries
+                System.Console.Write(_noEntriesCurrentMonth);
+                return;
+            }
+
+            // Calculate max width for the columns to pad them right
+            int width0 = items.Max(x => x.PostingDate.ToShortDateString().Length) + 1;
+            int width1 = Math.Max(items.Max(x => x.AccountNo.Length), _accountNumberColumn.Length) + 1;
+            int width2 = Math.Max(items.Max(x => x.AccountName.Length), _categoryColumn.Length) + 1;
+            int width3 = Math.Max(items.Max(x => x.Amount.ToString().Length), _amountColumn.Length) + 1;
+
+            // Define the format of the line
+            string format = "{0}{1}{2}{3}{4}\n";
+
+            // Show the table header
+            System.Console.Write(string.Format(format,
+                _dateColumn.PadRight(width0),
+                _accountNumberColumn.PadRight(width1),
+                _categoryColumn.PadRight(width2),
+                _amountColumn.PadRight(width3),
+                _descriptionColumn));
+
+            foreach (JournalEntry item in items)
+            {
+                // Format the string
+                string output = string.Format(format,
+                    item.PostingDate.ToShortDateString().PadRight(width0),
+                    item.AccountNo.PadRight(width1),
+                    item.AccountName.PadRight(width2),
+                    item.Amount.ToString().PadRight(width3),
+                    item.Description);
+
+                // Display the balance sheet line
+                System.Console.Write(output);
+            }
+        }
+
+        public void ShowCashflow(List<AccountBalanceEntry> items)
+        {
+            if (items.Count == 0)
+            {
+                // Tell the user there are no entries
+                System.Console.Write(_noCashflowEntries);
+                return;
+            }
+
+            // Calculate max width for the columns to pad them right
+            int width0 = _accountNumberColumn.Length + 1;
+            int width1 = items.Max(x => x.AccountName.Length + x.Level) + 1;
+            int width2 = Math.Max(items.Max(x => x.Amount.ToString().Length), _amountColumn.Length) + 1;
+
+            // Define the format of the line
+            string format = "{0}{1}{2}{3}\n";
+
+            // Show the table header
+            System.Console.Write(string.Format(format,
+                _accountNumberColumn.PadRight(width0),
+                _accountNameColumn.PadRight(width1),
+                _amountColumn.PadRight(width2),
+                _budgetColumn));
+
+            foreach (AccountBalanceEntry item in items)
+            {
+                // Format the string
+                string output = string.Format(format,
+                    item.AccountNo.PadRight(width0),
+                    (new string('-', item.Level) + item.AccountName).PadRight(width1),
+                    item.Amount.ToString().PadRight(width2),
+                    item.Budget);
+
+                // Display the balance sheet line
+                System.Console.Write(output);
+            }
+        }
+
+        private void UpdateBalanceSheet()
+        {
+            string accountNo = string.Empty;
+            double amount = 0;
+
+            // Ask user for Account No
+            System.Console.Write(_enterAccountNo);
+            accountNo = System.Console.ReadLine();
+
+            // Ask user for Amount
+            System.Console.Write(_enterAmount);
+            string separator = Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+            System.Windows.Forms.SendKeys.SendWait("0" + separator + "0");
+            amount = Double.Parse(System.Console.ReadLine());
+
+            BalanceSheetUpdated(this,
+                new AccountBalanceEntry()
+                {
+                    AccountNo = accountNo,
+                    Amount = amount
+                });
+
+            // Give the user the success feedback
+            System.Console.Write(_balanceSheetEntryUpdateOk);
         }
 
         public void SuggestGoals(List<GoalEntry> items)
@@ -304,6 +410,44 @@ namespace FinPlanner.Console
 
             // Give the user the success feedback
             System.Console.Write(_newGoalsSetOK);
+        }
+
+        private void AddNewJournalEntry()
+        {
+            string code = string.Empty;
+            string description = string.Empty;
+            DateTime date = DateTime.Now;
+            double amount = 0;
+
+            // Ask user for Date
+            System.Console.Write(_enterDate);
+            System.Windows.Forms.SendKeys.SendWait(DateTime.Now.ToShortDateString());
+            date = DateTime.Parse(System.Console.ReadLine());
+
+            // Ask user for Account No (Code)
+            System.Console.Write(_enterAccountNo);
+            code = System.Console.ReadLine();
+
+            // Ask user for Amount
+            System.Console.Write(_enterAmount);
+            string separator = Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+            System.Windows.Forms.SendKeys.SendWait("0" + separator + "0");
+            amount = Double.Parse(System.Console.ReadLine());
+
+            // Ask user for Description
+            System.Console.Write(_enterDescription);
+            description = System.Console.ReadLine();
+
+            JournalUpdated(this, new JournalEntry()
+            {
+                AccountNo = code,
+                Description = description,
+                PostingDate = date,
+                Amount = amount
+            });
+
+            // Give the user the success feedback
+            System.Console.Write(_journalEntryAddedOK);
         }
 
         private void CloseMonthEnd()

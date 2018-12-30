@@ -11,6 +11,7 @@ namespace FinPlanner.Core
         private const string _truncateGoalSetSQL = "TRUNCATE TABLE [dbo].[GoalSet]";
         private const string _exAccountNoNotFound = "Account No is not found!";
         private const string _noCashflowAccountFound = "No cashflow account found. Please, run the init script first.";
+        private const string _noCashflowRecordsFound = "No cashflow records found. Please, close the previous financial month.";
         private const string _noBalanceSheetAccountFound = "No balance sheet account found. Please, run the init script first.";
         private const string _noBalanceSheetRecordsFound = "No balance sheet records found. Please, close the previous financial month.";
         private const string _exMonthAlreadyClosed = "Financial month has been already closed.";
@@ -27,6 +28,9 @@ namespace FinPlanner.Core
             View.GoalListRequested += View_GoalListRequested;
             View.NewGoalsRequested += View_NewGoalsRequested;
             View.NewGoalsSelected += View_NewGoalsSelected;
+            View.CashflowRequested += View_CashflowRequested;
+            View.JournalRequested += View_JournalRequested;
+            View.JournalUpdated += View_JournalUpdated;
             View.MonthEndClosingRequested += View_MonthEndClosingRequested;
         }
 
@@ -167,6 +171,106 @@ namespace FinPlanner.Core
 
                 // Save changes to database
                 context.SaveChanges();
+            }
+        }
+
+        private void View_JournalRequested(object sender, DateTime e)
+        {
+            using (var context = new FinPlannerEntities())
+            {
+                var month = e.Month;
+                var year = e.Year;
+
+                // Project each row in the view into a JournalEntry
+                var entries = context.vJournal
+                    .Where(y => y.PostingDate.Year == year && y.PostingDate.Month == month)
+                    .Select(x =>
+                        new JournalEntry()
+                        {
+                            PostingDate = x.PostingDate,
+                            AccountNo = x.AccountNo,
+                            AccountName = x.AccountName,
+                            Amount = x.Amount,
+                            Description = x.Description
+                        }
+                        ).ToList();
+
+                // Display the journal on UI
+                View.ShowJournal(entries);
+            }
+        }
+
+        private void View_JournalUpdated(object sender, JournalEntry e)
+        {
+            // Check if the Account No exists
+            using (var context = new FinPlannerEntities())
+            {
+                var account = context.Account.SingleOrDefault(
+                    x => x.AccountNo == e.AccountNo && x.DocumentID == _cashflowDocumentID);
+
+                // If account is not found
+                if (account == null)
+                {
+                    throw new CoreException(_exAccountNoNotFound);
+                }
+
+                context.Journal.Add(new Journal()
+                {
+                    AccountID = account.AccountID,
+                    Amount = e.Amount,
+                    PostingDate = e.PostingDate,
+                    Description = e.Description
+                });
+
+                context.SaveChanges();
+            }
+        }
+
+        private void View_CashflowRequested(object sender, DateTime e)
+        {
+            // Check if the previous month is closed
+            using (var context = new FinPlannerEntities())
+            {
+                // Get a cashflow account
+                var accountEx = context.Account.Where(x => x.DocumentID == _cashflowDocumentID).FirstOrDefault();
+
+                // Check if the account does not exist
+                if (accountEx == null)
+                {
+                    throw new CoreException(_noCashflowAccountFound);
+                }
+
+                // Get the last balance record for this cashflow account
+                var balance = context.Balance.Where(x => x.AccountID == accountEx.AccountID).OrderByDescending(x => x.BalanceID).FirstOrDefault();
+
+                // Check if the balance record is not found
+                if (balance == null)
+                {
+                    throw new CoreException(_noCashflowRecordsFound);
+                }
+
+                // Sum up the journal entries into the Cashflow statement
+                context.uspTransferJournalIntoCashflow(e);
+
+                // Calculate the cashflow totals
+                context.uspCalculateCashflowTotals(e);
+
+                // Project each row in the view into a BalanceSheetEntry 
+                var sheet = context.vCashflow
+                    .Where(x => x.PostingDate.Value.Year == e.Year && x.PostingDate.Value.Month == e.Month)
+                    .Select(x =>
+                    new AccountBalanceEntry()
+                    {
+                        AccountNo = x.AccountNo,
+                        AccountName = x.AccountName,
+                        Amount = x.Amount,
+                        Budget = x.Budget,
+                        Level = x.Level
+                    }
+                    ).ToList();
+
+                // Show the list on UI
+                View.ShowCashflow(sheet);
             }
         }
 

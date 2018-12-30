@@ -67,6 +67,9 @@
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
     <Compile Include="IView.cs" />
+    <Compile Include="Journal.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="Model.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -87,7 +90,13 @@
     <Compile Include="vBalanceSheet.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
+    <Compile Include="vCashflow.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
     <Compile Include="vGoals.cs">
+      <DependentUpon>Model.tt</DependentUpon>
+    </Compile>
+    <Compile Include="vJournal.cs">
       <DependentUpon>Model.tt</DependentUpon>
     </Compile>
   </ItemGroup>

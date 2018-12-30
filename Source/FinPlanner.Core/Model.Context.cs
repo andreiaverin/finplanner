@@ -45,9 +45,15 @@ public partial class FinPlannerEntities : DbContext
 
     public virtual DbSet<GoalSet> GoalSet { get; set; }
 
+    public virtual DbSet<Journal> Journal { get; set; }
+
     public virtual DbSet<vBalanceSheet> vBalanceSheet { get; set; }
 
+    public virtual DbSet<vCashflow> vCashflow { get; set; }
+
     public virtual DbSet<vGoals> vGoals { get; set; }
+
+    public virtual DbSet<vJournal> vJournal { get; set; }
 
 
     public virtual int uspCalculateBalanceSheetTotals(Nullable<System.DateTime> monthSelector)
@@ -62,6 +68,18 @@ public partial class FinPlannerEntities : DbContext
     }
 
 
+    public virtual int uspCalculateCashflowTotals(Nullable<System.DateTime> monthSelector)
+    {
+
+        var monthSelectorParameter = monthSelector.HasValue ?
+            new ObjectParameter("monthSelector", monthSelector) :
+            new ObjectParameter("monthSelector", typeof(System.DateTime));
+
+
+        return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("uspCalculateCashflowTotals", monthSelectorParameter);
+    }
+
+
     public virtual int uspCloseFinancialMonth(Nullable<System.DateTime> monthSelector)
     {
 
@@ -71,6 +89,18 @@ public partial class FinPlannerEntities : DbContext
 
 
         return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("uspCloseFinancialMonth", monthSelectorParameter);
+    }
+
+
+    public virtual int uspTransferJournalIntoCashflow(Nullable<System.DateTime> monthSelector)
+    {
+
+        var monthSelectorParameter = monthSelector.HasValue ?
+            new ObjectParameter("monthSelector", monthSelector) :
+            new ObjectParameter("monthSelector", typeof(System.DateTime));
+
+
+        return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("uspTransferJournalIntoCashflow", monthSelectorParameter);
     }
 
 }
